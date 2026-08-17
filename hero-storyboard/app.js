@@ -118,6 +118,7 @@ function createPathogens() {
   positions.forEach(([x,y,size], index) => {
     const [driftX, driftY] = drifts[index % drifts.length];
     const button = document.createElement('button');
+    let hoverLockTimer = null;
     button.className = 'pathogen';
     button.type = 'button';
     if (isVideoStoryboard) button.dataset.scanPair = String(index % pathogenPairCount + 1);
@@ -128,8 +129,24 @@ function createPathogens() {
     button.innerHTML = isVideoStoryboard
       ? `<img src="${vectorPathogenSources[index % vectorPathogenSources.length]}" alt="" />`
       : `<svg viewBox="0 0 100 100"><path d="${pathogenPaths[index % pathogenPaths.length]}" /></svg>`;
-    button.addEventListener('mouseenter', () => { if (frame === 4) button.classList.add('is-selected'); });
-    button.addEventListener('mouseleave', () => { if (frame === 4) button.classList.remove('is-selected'); });
+    button.addEventListener('mouseenter', () => {
+      if (frame !== 4) return;
+      button.classList.add('is-selected');
+      if (!isVideoStoryboard) return;
+      button.classList.add('is-threat-locking');
+      clearTimeout(hoverLockTimer);
+      hoverLockTimer = window.setTimeout(() => {
+        if (frame !== 4 || !button.matches(':hover')) return;
+        button.classList.add('is-threat-locked');
+        lockPathogen(button);
+      }, 2000);
+    });
+    button.addEventListener('mouseleave', () => {
+      if (frame !== 4) return;
+      clearTimeout(hoverLockTimer);
+      hoverLockTimer = null;
+      button.classList.remove('is-selected', 'is-threat-locking', 'is-threat-locked');
+    });
     button.addEventListener('click', () => {
       if (isVideoStoryboard ? frame !== 4 : frame < 4 || frame > 5) return;
       document.querySelectorAll('.pathogen').forEach(p => p.classList.remove('is-selected'));
