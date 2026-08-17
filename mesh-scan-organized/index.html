@@ -1,0 +1,28 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesh Scan 08-1 — Volumetric Studies</title>
+<main class="study-page mesh-scan-page mesh-scan-organized-page">
+  <canvas class="webgl" aria-label="A dropped GLB model converted into an organized lattice point cloud"></canvas>
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/mesh-scan/">← 08</a><a href="/">Study 08-1 / Ordered Mesh</a><a class="next" href="/dither-trail/">09 →</a>
+  </nav>
+  <div class="study-status eyebrow">MESH SCAN 08-1 / ORDERED LATTICE → SLICE</div>
+  <label class="image-drop model-drop" id="model-drop">
+    <input id="model-input" type="file" accept=".glb,model/gltf-binary">
+    <span>DROP / SELECT GLB</span>
+    <span class="image-drop-type model-drop-type">GLB · 3D MESH</span>
+  </label>
+  <div id="mesh-loading" class="mesh-loading"><span>Loading model</span><output>0%</output></div>
+  <section class="controls" aria-label="Study controls">
+    <div class="control"><span class="control-label">Asset</span><span id="asset-name" class="sequence-current">RUGGED SERVER</span><output class="readout">GLB</output></div>
+    <label class="control"><span class="control-label">Slice</span><input id="mesh-slice" type="range" min="-3" max="3" value="1.8" step="0.01"><output class="readout" data-for="mesh-slice"></output></label>
+    <label class="control"><span class="control-label">Thickness</span><input id="mesh-width" type="range" min="0.03" max="1.2" value="0.56" step="0.01"><output class="readout" data-for="mesh-width"></output></label>
+    <label class="control"><span class="control-label">Point size</span><input id="mesh-point-size" type="range" min="0.5" max="3.5" value="3.5" step="0.05"><output class="readout" data-for="mesh-point-size"></output></label>
+    <label class="control"><span class="control-label">Color</span><input id="mesh-color" class="point-color" type="color" value="#509dce"><output id="mesh-color-readout" class="readout">#509DCE</output></label>
+    <label class="control"><span class="control-label">Density</span><input id="mesh-density" type="range" min="0.05" max="2" value="1.04" step="0.01"><output class="readout" data-for="mesh-density"></output></label>
+    <label class="control"><span class="control-label">Spacing</span><input id="mesh-spacing" type="range" min="0.035" max="0.12" value="0.035" step="0.005"><output class="readout" data-for="mesh-spacing"></output></label>
+    <label class="control"><span class="control-label">Zoom</span><input id="mesh-zoom" type="range" min="3" max="14" value="11.7" step="0.1"><output class="readout" data-for="mesh-zoom"></output></label>
+    <div class="control"><span class="control-label">Hero cut</span><button id="mesh-replay" class="mesh-replay" type="button">Replay</button><output id="mesh-cut-state" class="readout">READY</output></div>
+  </section>
+</main>
+<script type="module" src="/src/studies/mesh-scan-organized.js"></script>

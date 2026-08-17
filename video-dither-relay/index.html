@@ -1,0 +1,41 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Dither Relay — Rendering Studies II</title>
+<main class="study-page video-dither-page is-recording-clean">
+  <canvas class="webgl video-dither-canvas" aria-label="Video translated into glyph dither, organically erased, then replaced by a context frame"></canvas>
+  <video id="video-dither-source" class="video-dither-source" muted playsinline preload="auto">
+    <source src="/assets/experiment-19-source.mp4" type="video/mp4">
+  </video>
+
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/hover-propagation/">← 18</a>
+    <a href="/rendering-studies/">Rendering Studies II / 04</a>
+    <a class="next" href="/image-dither/">20 →</a>
+  </nav>
+
+  <div class="study-status eyebrow">VIDEO DITHER → ORGANIC ERASE → CONTEXT REVEAL</div>
+
+  <div id="video-dither-loading" class="render-loading">
+    <span>Preparing video glyph field</span><output>LOAD</output>
+  </div>
+
+  <div class="video-sequence-status" aria-live="polite">
+    <span>Sequence</span><output id="video-sequence-stage">VIDEO</output>
+  </div>
+
+  <button id="video-gui-toggle" class="gui-toggle video-dither-gui" type="button" aria-pressed="true">Show GUI · H</button>
+
+  <section class="controls render-controls video-dither-controls" aria-label="Video dither relay controls">
+    <label class="control"><span class="control-label">Cell size</span><input id="video-cell" type="range" min="7" max="30" value="13" step="1"><output class="readout" data-for="video-cell"></output></label>
+    <label class="control"><span class="control-label">Contrast</span><input id="video-contrast" type="range" min="0.5" max="3.5" value="1.55" step="0.05"><output class="readout" data-for="video-contrast"></output></label>
+    <label class="control"><span class="control-label">Black cutoff</span><input id="video-black-cutoff" type="range" min="0" max="0.5" value="0.08" step="0.01"><output class="readout" data-for="video-black-cutoff"></output></label>
+    <label class="control"><span class="control-label">Erase</span><input id="video-erase-duration" type="range" min="0.6" max="4" value="2.2" step="0.1"><output class="readout" data-for="video-erase-duration"></output></label>
+    <label class="control"><span class="control-label">Blank gap</span><input id="video-blank-duration" type="range" min="0" max="3" value="1" step="0.1"><output class="readout" data-for="video-blank-duration"></output></label>
+    <label class="control"><span class="control-label">Reveal</span><input id="video-reveal-duration" type="range" min="0.6" max="4" value="2.2" step="0.1"><output class="readout" data-for="video-reveal-duration"></output></label>
+    <label class="control"><span class="control-label">Hold</span><input id="video-hold-duration" type="range" min="0.5" max="8" value="3" step="0.25"><output class="readout" data-for="video-hold-duration"></output></label>
+    <label class="control"><span class="control-label">Stroke</span><input id="video-stroke-color" type="color" value="#1c81bd"><output class="readout" data-for="video-stroke-color"></output></label>
+    <label class="shader-toggle render-toggle"><input id="video-sequence-play" type="checkbox" checked><span>Play sequence</span></label>
+    <button type="button" id="video-sequence-restart" class="render-restart">Restart sequence</button>
+  </section>
+</main>
+<script type="module" src="/src/studies/video-dither-relay.js"></script>

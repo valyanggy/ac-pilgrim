@@ -1,0 +1,25 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesh Scan — Volumetric Studies</title>
+<main class="study-page mesh-scan-page">
+  <canvas class="webgl" aria-label="A dropped GLB model converted into an interactive point cloud"></canvas>
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/ascii-scan/">← 07</a><a href="/">Study 08 / Mesh Scan</a><a class="next" href="/mesh-scan-organized/">08-1 →</a>
+  </nav>
+  <div class="study-status eyebrow">MESH SCAN / DROP GLB → SLICE</div>
+  <label class="image-drop model-drop" id="model-drop">
+    <input id="model-input" type="file" accept=".glb,model/gltf-binary">
+    <span>DROP / SELECT GLB</span>
+    <span class="image-drop-type model-drop-type">GLB · 3D MESH</span>
+  </label>
+  <div id="mesh-loading" class="mesh-loading"><span>Loading model</span><output>0%</output></div>
+  <section class="controls" aria-label="Study controls">
+    <div class="control"><span class="control-label">Asset</span><span id="asset-name" class="sequence-current">RUGGED SERVER</span><output class="readout">GLB</output></div>
+    <label class="control"><span class="control-label">Slice</span><input id="mesh-slice" type="range" min="-3" max="3" value="0.4" step="0.01"><output class="readout" data-for="mesh-slice"></output></label>
+    <label class="control"><span class="control-label">Thickness</span><input id="mesh-width" type="range" min="0.03" max="1.2" value="0.2" step="0.01"><output class="readout" data-for="mesh-width"></output></label>
+    <label class="control"><span class="control-label">Point size</span><input id="mesh-point-size" type="range" min="0.5" max="3.5" value="1.15" step="0.05"><output class="readout" data-for="mesh-point-size"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="mesh-density" type="range" min="0.05" max="1" value="0.55" step="0.01"><output class="readout" data-for="mesh-density"></output></label>
+    <label class="control"><span class="control-label">Zoom</span><input id="mesh-zoom" type="range" min="4" max="14" value="10.5" step="0.1"><output class="readout" data-for="mesh-zoom"></output></label>
+  </section>
+</main>
+<script type="module" src="/src/studies/mesh-scan.js"></script>

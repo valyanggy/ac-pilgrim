@@ -1,0 +1,31 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Depth Travel — Volumetric Studies</title>
+<main class="study-page">
+  <canvas class="webgl" aria-label="A looping corridor of depth images travelled by camera and focus slice"></canvas>
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/image-depth/">← 01</a><a href="/">Study 02 / 08</a><a class="next" href="/scan-mask/">03 →</a>
+  </nav>
+  <div class="study-status eyebrow">INFINITE DEPTH / SCROLL → IMAGE TO IMAGE</div>
+  <section class="sequence-editor" id="sequence-editor" aria-label="Image sequence editor">
+    <header class="sequence-editor-header">
+      <span>Image sequence</span>
+      <label class="sequence-add">+ Add<input id="image-input" type="file" accept="image/png,image/jpeg,image/webp" multiple></label>
+    </header>
+    <div class="sequence-list" id="sequence-list"></div>
+    <div class="sequence-editor-status" id="sequence-editor-status">Drop images here</div>
+  </section>
+  <section class="controls" aria-label="Study controls">
+    <div class="control"><span class="control-label">Current</span><span class="sequence-current" id="sequence-current">Device → Subway</span><output class="readout" data-for="asset-set">A→B</output></div>
+    <label class="control"><span class="control-label">Travel</span><input id="travel" type="range" min="0" max="1" value="0.38" step="0.001"><output class="readout" data-for="travel"></output></label>
+    <label class="control"><span class="control-label">Scan timing</span><input id="scan-timing" type="range" min="-4" max="4" value="0" step="0.05"><output class="readout" data-for="scan-timing"></output></label>
+    <label class="control"><span class="control-label">Scan speed</span><input id="scan-speed" type="range" min="0.4" max="2.4" value="1" step="0.01"><output class="readout" data-for="scan-speed"></output></label>
+    <label class="control"><span class="control-label">Far points</span><input id="far-points" type="range" min="0.15" max="1" value="0.65" step="0.01"><output class="readout" data-for="far-points"></output></label>
+    <label class="control"><span class="control-label">Image gap</span><input id="image-gap" type="range" min="8" max="28" value="15" step="0.1"><output class="readout" data-for="image-gap"></output></label>
+    <label class="control"><span class="control-label">Point density</span><input id="point-density" type="range" min="0.25" max="1" value="0.85" step="0.05"><output class="readout" data-for="point-density"></output></label>
+    <label class="control"><span class="control-label">Point color</span><input class="point-color" id="point-color" type="color" value="#79e0cf"><output class="readout" data-for="point-color">#79E0CF</output></label>
+    <label class="control"><span class="control-label">Thickness</span><input id="width" type="range" min="0.06" max="3.5" value="0.72" step="0.01"><output class="readout" data-for="width"></output></label>
+    <label class="control"><span class="control-label">Depth</span><input id="depth" type="range" min="0.5" max="6.5" value="6.5" step="0.01"><output class="readout" data-for="depth"></output></label>
+  </section>
+</main>
+<script type="module" src="/src/studies/depth-travel.js"></script>

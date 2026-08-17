@@ -1,0 +1,89 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNA Dither — Volumetric Studies</title>
+<main class="study-page shader-dither-page dna-dither-page">
+  <section class="shader-stage" aria-label="Pilgrim glyph field with a hover-triggered ATCG field">
+    <div class="shader-image-frame" aria-hidden="true"></div>
+    <canvas class="shader-canvas" aria-label="Chest X-ray rendered with Pilgrim glyphs and hover ATCG cells"></canvas>
+  </section>
+
+  <div class="shader-axis shader-axis-x" aria-hidden="true">ATCG / 000—640</div>
+  <div class="shader-axis shader-axis-y" aria-hidden="true">BASE—PILGRIM / HOVER—DNA</div>
+
+  <nav class="study-nav shader-ui" aria-label="Study navigation">
+    <a href="/shader-dither/">← 10</a><a href="/">Study 11 / DNA Dither</a><a class="next" href="/dna-helix/">12 →</a>
+  </nav>
+  <div class="study-status eyebrow shader-ui">DUAL GLYPH FIELD / HOVER PILGRIM → ATCG</div>
+
+  <section class="shader-controls shader-ui" aria-label="DNA dither controls">
+    <div class="shader-source-status"><span id="shader-source-state">GLYPH SETS</span><b>PILGRIM <span id="shader-glyph-count">—</span> / ATCG 4</b></div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Base / Pilgrim</div>
+      <div class="shader-segment" id="shader-mode">
+        <button type="button" data-mode="grid" class="is-active">Uniform grid</button>
+        <button type="button" data-mode="quad">Quadtree</button>
+      </div>
+      <label class="control"><span class="control-label">Base cell</span><input id="shader-cell" type="range" min="6" max="20" value="12" step="1"><output class="readout" data-for="shader-cell"></output></label>
+      <label class="control"><span class="control-label">Detail</span><input id="shader-detail" type="range" min="0.02" max="0.3" value="0.1" step="0.01"><output class="readout" data-for="shader-detail"></output></label>
+      <div class="shader-control-head"><span>Max cell</span><output id="shader-max-output">4×</output></div>
+      <div class="shader-segment shader-segment-three" id="shader-max-scale">
+        <button type="button" data-scale="1">1×</button>
+        <button type="button" data-scale="2">2×</button>
+        <button type="button" data-scale="4" class="is-active">4×</button>
+      </div>
+      <div class="shader-control-head"><span>Base cells</span><output id="shader-base-cell-count">—</output></div>
+    </div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Hover / ATCG · Four-state color</div>
+      <div class="dna-palette" aria-label="ATCG color mapping">
+        <span class="dna-a">A</span>
+        <span class="dna-t">T</span>
+        <span class="dna-c">C</span>
+        <span class="dna-g">G</span>
+      </div>
+      <div class="shader-segment" id="hover-mode">
+        <button type="button" data-mode="grid">Uniform grid</button>
+        <button type="button" data-mode="quad" class="is-active">Quadtree</button>
+      </div>
+      <label class="control"><span class="control-label">Base cell</span><input id="hover-cell" type="range" min="6" max="20" value="12" step="1"><output class="readout" data-for="hover-cell"></output></label>
+      <label class="control"><span class="control-label">Detail</span><input id="hover-detail" type="range" min="0.02" max="0.3" value="0.1" step="0.01"><output class="readout" data-for="hover-detail"></output></label>
+      <label class="control"><span class="control-label">Glyph scale</span><input id="hover-glyph-scale" type="range" min="0.4" max="1" value="0.9" step="0.01"><output class="readout" data-for="hover-glyph-scale"></output></label>
+      <label class="control"><span class="control-label">Layer bleed</span><input id="hover-bleed" type="range" min="0" max="48" value="18" step="2"><output class="readout" data-for="hover-bleed"></output></label>
+      <div class="shader-control-head"><span>Max cell</span><output id="hover-max-output">4×</output></div>
+      <div class="shader-segment shader-segment-three" id="hover-max-scale">
+        <button type="button" data-scale="1">1×</button>
+        <button type="button" data-scale="2">2×</button>
+        <button type="button" data-scale="4" class="is-active">4×</button>
+      </div>
+      <label class="control"><span class="control-label">Brush radius</span><input id="shader-radius" type="range" min="12" max="220" value="72" step="1"><output class="readout" data-for="shader-radius"></output></label>
+      <label class="control"><span class="control-label">Hover density</span><input id="hover-density" type="range" min="0" max="1" value="1" step="0.01"><output class="readout" data-for="hover-density"></output></label>
+      <label class="control"><span class="control-label">Decay</span><input id="shader-life" type="range" min="0.3" max="2.5" value="1.25" step="0.05"><output class="readout" data-for="shader-life"></output></label>
+      <div class="shader-segment shader-segment-one"><button type="button" id="dna-reroll">Reroll sequence</button></div>
+      <div class="shader-control-head"><span>Sequence balance</span><output id="dna-sequence-stats">—</output></div>
+      <div class="shader-control-head"><span>Hover cells</span><output id="shader-hover-cell-count">—</output></div>
+    </div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Tone</div>
+      <label class="control"><span class="control-label">Gradation</span><input id="shader-gradation" type="range" min="2" max="37" value="37" step="1"><output class="readout" data-for="shader-gradation"></output></label>
+      <label class="control"><span class="control-label">Black</span><input id="shader-black" type="range" min="0" max="0.2" value="0.06" step="0.005"><output class="readout" data-for="shader-black"></output></label>
+      <label class="control"><span class="control-label">White</span><input id="shader-white" type="range" min="0.25" max="1" value="0.9" step="0.01"><output class="readout" data-for="shader-white"></output></label>
+      <label class="control"><span class="control-label">Glyph scale</span><input id="shader-glyph-scale" type="range" min="0.4" max="1" value="0.9" step="0.01"><output class="readout" data-for="shader-glyph-scale"></output></label>
+      <label class="shader-toggle"><input id="shader-invert" type="checkbox" checked><span>Invert (bright = dense)</span></label>
+    </div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Base glyph color by value</div>
+      <div class="shader-segment shader-segment-three" id="shader-ramp">
+        <button type="button" data-ramp="blue" class="is-active">Blue</button>
+        <button type="button" data-ramp="green">Green</button>
+        <button type="button" data-ramp="mono">B&amp;W</button>
+      </div>
+      <div class="shader-ramp-preview" id="shader-ramp-preview" aria-label="Current six-color luminance ramp"></div>
+      <div class="shader-control-head"><span>ATCG color</span><output>FOUR-STATE BLOCKS</output></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="/src/studies/dna-dither.js"></script>

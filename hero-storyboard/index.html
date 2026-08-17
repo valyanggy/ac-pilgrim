@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#02090d" />
+    <title>ARGUS / Hero Sequence</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="storyboard" aria-label="Argus interactive hero storyboard">
+      <section class="hero-stage is-depth-gui-hidden" id="heroStage" data-frame="1" aria-live="polite">
+        <canvas id="sceneCanvas" aria-hidden="true"></canvas>
+        <img class="airport-scan-base" src="/assets/hero-home-pilgrim.png" alt="" aria-hidden="true" />
+        <canvas id="heroMeshCanvas" class="hero-mesh-canvas" aria-label="Argus ordered point-cloud scan"></canvas>
+        <div class="scanlines" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+
+        <nav class="storyboard-nav" aria-label="Study navigation">
+          <a href="/ring-scan/">← 21</a>
+          <a href="/rendering-studies/">Rendering Studies II / 07</a>
+          <a class="next" href="/hero-storyboard-07-2/">07-2 →</a>
+        </nav>
+
+        <!-- <header class="system-header hud-layer">
+          <div class="system-state"><i></i><span id="systemState">SYSTEM / STANDBY</span></div>
+        </header> -->
+
+        <div class="device-scene scene-layer" aria-hidden="true">
+          <div class="point-field"></div>
+          <div class="device">
+            <div class="device-rim"></div>
+            <div class="device-screen"><span>ARGUS</span><i></i></div>
+            <div class="device-status">AIRBORNE INTELLIGENCE</div>
+          </div>
+          <p class="scene-caption">AN AUTONOMOUS BIOAEROSOL<br />DETECTION NETWORK</p>
+        </div>
+
+        <div class="vision-scene scene-layer">
+          <div class="vision-label hud-layer"><i></i> OPTICAL FIELD / ACTIVE</div>
+          <div class="reticle hud-layer" aria-hidden="true"><span></span></div>
+          <div class="bracket bracket-left hud-layer"></div>
+          <div class="bracket bracket-right hud-layer"></div>
+          <div class="azimuth hud-layer"><b>−30</b><i></i><b>0</b><i></i><b>30</b></div>
+          <div class="detection-log hud-layer">
+            <span>DETECTION LOG</span>
+            <p>08:41:52 PARTICULATE · CLEARED<br />08:42:03 INFLUENZA · 61.0μ<br />08:42:16 RHINOVIRUS · 23.5μ</p>
+          </div>
+          <div class="environment hud-layer">TEMP 21.4°C&nbsp;&nbsp; HUM 44%<br />08:42:17</div>
+          <div class="threat-meter hud-layer">
+            <span>THREAT LEVEL</span><strong>ELEVATED</strong>
+            <div><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <p class="interaction-hint hud-layer"><span></span> HOVER A PARTICLE TO ISOLATE</p>
+          <div id="pathogenLayer" class="pathogen-layer" aria-label="Airborne particles"></div>
+        </div>
+
+        <div class="analysis-scene scene-layer" aria-hidden="true">
+          <div class="analysis-heading">
+            <span>ISOLATED SAMPLE / #A-172</span>
+            <strong id="analysisTitle">STRUCTURAL MATCH</strong>
+          </div>
+          <div class="specimen-wrap">
+            <div class="sample-brackets"></div>
+            <svg class="specimen" viewBox="0 0 320 320" role="img" aria-label="Isolated pathogen sample">
+              <defs>
+                <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <path d="M160 38c31 0 32 43 55 52s48-20 67 1-12 45-2 69 46 22 42 51-43 17-58 37 4 51-23 63-42-25-69-23-42 40-68 25 0-47-13-68-51-14-54-43 38-29 47-54-19-48 3-68 43 12 67-1 21-52 50-52z" />
+              <circle cx="160" cy="166" r="43" />
+            </svg>
+            <div class="scan-beam"></div>
+            <div class="data-rain"></div>
+          </div>
+          <div class="match-rail">
+            <span>INTERNAL DATABASE / 12,849 STRUCTURES</span>
+            <div class="match-items">
+              <i></i><i></i><i class="active"></i><i></i><i></i><i></i>
+            </div>
+            <strong id="matchReadout">MATCHING 00%</strong>
+          </div>
+          <div class="analysis-meta left">SAMPLE INTEGRITY&nbsp; 99.82%<br />MESH NODES&nbsp; 14,208</div>
+          <div class="analysis-meta right">CLASS&nbsp; PENDING<br />RISK&nbsp; CALCULATING</div>
+        </div>
+
+        <div class="map-scene scene-layer" aria-hidden="true">
+          <div class="map-grid"></div>
+          <svg class="world-map" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid meet">
+            <g class="map-points" id="mapPoints"></g>
+          </svg>
+          <div class="map-kicker">ARGUS / GLOBAL SENSOR NETWORK</div>
+          <div class="final-copy">
+            <p>EARLY SIGNAL. GLOBAL RESPONSE.</p>
+            <h1>DETECT PANDEMICS<br />BEFORE THEY BEGIN.</h1>
+            <button id="specsButton" type="button">EXPLORE THE SYSTEM <span>↓</span></button>
+          </div>
+          <div class="network-status"><i></i> 247 NODES ONLINE</div>
+        </div>
+
+        <button id="depthGuiToggle" class="depth-gui-toggle" type="button" aria-expanded="false">Show GUI</button>
+        <section id="depthGui" class="depth-gui" aria-label="Depth travel controls">
+          <header><span>Depth travel</span><output id="depthSequence">ARGUS → PEOPLE</output></header>
+          <label><span>Travel</span><input id="depthTravel" type="range" min="0" max="1" value="0" step="0.001"><output data-depth-output="travel">0%</output></label>
+          <label><span>Scan timing</span><input id="depthScanTiming" type="range" min="-4" max="4" value="0" step="0.05"><output data-depth-output="scanTiming">+0.0</output></label>
+          <label><span>Scan speed</span><input id="depthScanSpeed" type="range" min="0.4" max="2.4" value="1" step="0.01"><output data-depth-output="scanSpeed">1.00×</output></label>
+          <label><span>Far points</span><input id="depthFarPoints" type="range" min="0.15" max="1" value="0.65" step="0.01"><output data-depth-output="farPoints">65%</output></label>
+          <label><span>Image gap</span><input id="depthImageGap" type="range" min="16" max="40" value="28" step="0.1"><output data-depth-output="imageGap">28.0 Z</output></label>
+          <label><span>Points</span><input id="depthDensity" type="range" min="0.05" max="1" value="0.27" step="0.01"><output data-depth-output="density">27%</output></label>
+          <label><span>Color</span><input id="depthColor" type="color" value="#003758"><output data-depth-output="color">#003758</output></label>
+          <label><span>Thickness</span><input id="depthWidth" type="range" min="0.005" max="0.2" value="0.039" step="0.001"><output data-depth-output="width">0.039</output></label>
+          <label><span>Depth</span><input id="depthAmount" type="range" min="0.5" max="6.5" value="6.5" step="0.01"><output data-depth-output="depth">6.5×</output></label>
+        </section>
+
+      </section>
+
+      <nav class="story-controls" aria-label="Storyboard frame controls">
+        <button class="play-button" id="playButton" type="button" aria-label="Play sequence"><span>▶</span></button>
+        <div class="timeline" id="timeline" role="tablist" aria-label="Sequence frames"></div>
+        <div class="control-meta">
+          <div class="frame-index"><span id="frameNumber">01</span> / 09</div>
+          <button class="stage-next" id="stageNext" type="button" aria-label="Next frame">NEXT <span>→</span></button>
+        </div>
+      </nav>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

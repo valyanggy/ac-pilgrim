@@ -1,0 +1,49 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ring Scan — Rendering Studies II</title>
+<main class="study-page dither-render-page ring-scan-page is-gui-hidden">
+  <canvas class="webgl" aria-label="Lace star ring split by a moving scan line into dither above and textured 3D below"></canvas>
+
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/image-dither/">← 20</a><a href="/rendering-studies/">Rendering Studies II / 06</a><a class="next" href="/hero-storyboard/">22 →</a>
+  </nav>
+  <div class="study-status eyebrow">DITHER ABOVE / MATERIAL BELOW / LIVE SCAN</div>
+
+  <div id="render-loading" class="render-loading">
+    <span>Loading lace star ring</span><output>0%</output>
+  </div>
+
+  <div class="render-scan-label ring-scan-label" aria-hidden="true"></div>
+
+  <button class="gui-toggle ring-scan-gui-toggle" type="button" aria-expanded="false">Show GUI</button>
+
+  <section class="render-readout" aria-label="Experiment description">
+    <p>Rendering Studies II / Experiment 06</p>
+    <h1>RING<br>SCAN</h1>
+    <div>ABOVE — FIVE-COLOR DITHER<br>LINE — STYLE BOUNDARY<br>BELOW — TEXTURED GLB</div>
+  </section>
+
+  <section class="controls render-controls ring-scan-controls" aria-label="Ring scan controls">
+    <div class="render-control-section">Scan</div>
+    <label class="control"><span class="control-label">Position</span><input id="render-progress" type="range" min="0" max="1" value="0.5" step="0.001"><output class="readout" data-for="render-progress"></output></label>
+    <label class="control"><span class="control-label">Speed</span><input id="render-speed" type="range" min="0.005" max="0.15" value="0.02" step="0.005"><output class="readout" data-for="render-speed"></output></label>
+    <label class="control"><span class="control-label">Glyph size</span><input id="render-cell" type="range" min="7" max="28" value="13" step="1"><output class="readout" data-for="render-cell"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="render-density" type="range" min="0.1" max="1" value="0.96" step="0.01"><output class="readout" data-for="render-density"></output></label>
+    <label class="control"><span class="control-label">Threshold</span><input id="render-threshold" type="range" min="0" max="1" value="0.06" step="0.01"><output class="readout" data-for="render-threshold"></output></label>
+    <label class="control"><span class="control-label">Contrast</span><input id="render-contrast" type="range" min="0.1" max="10" value="2.15" step="0.05"><output class="readout" data-for="render-contrast"></output></label>
+    <div class="render-control-section">SEM material</div>
+    <label class="control"><span class="control-label">Brightness</span><input id="ring-sem-brightness" type="range" min="0.4" max="3" value="1.1" step="0.05"><output class="readout" data-for="ring-sem-brightness"></output></label>
+    <label class="control"><span class="control-label">Shadow detail</span><input id="ring-sem-shadow-detail" type="range" min="0" max="1" value="0.9" step="0.01"><output class="readout" data-for="ring-sem-shadow-detail"></output></label>
+    <label class="control"><span class="control-label">Edge detail</span><input id="ring-sem-edge" type="range" min="0" max="5" value="1.4" step="0.1"><output class="readout" data-for="ring-sem-edge"></output></label>
+    <div class="render-control-section">Dither palette</div>
+    <label class="control"><span class="control-label">Shadow</span><input id="ring-color-1" type="color" value="#616161"><output class="readout" data-for="ring-color-1"></output></label>
+    <label class="control"><span class="control-label">Low</span><input id="ring-color-2" type="color" value="#de1705"><output class="readout" data-for="ring-color-2"></output></label>
+    <label class="control"><span class="control-label">Midtone</span><input id="ring-color-3" type="color" value="#d9d9d9"><output class="readout" data-for="ring-color-3"></output></label>
+    <label class="control"><span class="control-label">High</span><input id="ring-color-4" type="color" value="#ffffff"><output class="readout" data-for="ring-color-4"></output></label>
+    <label class="control"><span class="control-label">Highlight</span><input id="ring-color-5" type="color" value="#ffffff"><output class="readout" data-for="ring-color-5"></output></label>
+    <label class="shader-toggle render-toggle"><input id="render-play" type="checkbox" checked><span>Auto scan</span></label>
+    <label class="shader-toggle render-toggle"><input id="render-loop" type="checkbox" checked><span>Loop sequence</span></label>
+    <button type="button" id="render-restart" class="render-restart">Restart scan</button>
+  </section>
+</main>
+<script type="module" src="/src/studies/dither-render.js"></script>

@@ -1,0 +1,83 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNA Helix Assembly — Volumetric Studies</title>
+<main class="study-page dna-helix-page dna-helix-atcg-page is-gui-hidden">
+  <canvas class="webgl" aria-label="Rotating double helix breaking into dithered DNA fragments from right to left"></canvas>
+
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/dna-helix/">← 12</a><a href="/">Study 13 / DNA Helix Assembly</a><a class="next" href="/dither-render/">14 →</a>
+  </nav>
+  <div class="study-status eyebrow">3D DUAL GLYPH SHADER / FRAGMENTS → BRAID</div>
+
+  <div id="helix-loading" class="helix-loading">
+    <span>Loading DNA geometry</span><output>0%</output>
+  </div>
+
+  <div id="helix-hotspots" class="helix-hotspots" aria-label="DNA camera points">
+    <button type="button" class="helix-hotspot is-left" data-hotspot="0" aria-label="Focus camera on Pilgrim Argus">
+      <span class="helix-hotspot-marker" aria-hidden="true"></span>
+      <span class="helix-hotspot-banner"><span>PILGRIM</span><b>ARGUS</b></span>
+    </button>
+    <button type="button" class="helix-hotspot is-right" data-hotspot="1" aria-label="Focus camera on Pilgrim Kingsfoil">
+      <span class="helix-hotspot-marker" aria-hidden="true"></span>
+      <span class="helix-hotspot-banner"><span>PILGRIM</span><b>KINGSFOIL</b></span>
+    </button>
+    <button type="button" class="helix-hotspot is-left" data-hotspot="2" aria-label="Focus camera on Pilgrim Biocore">
+      <span class="helix-hotspot-marker" aria-hidden="true"></span>
+      <span class="helix-hotspot-banner"><span>PILGRIM</span><b>BIOCORE</b></span>
+    </button>
+  </div>
+
+  <aside id="helix-product-viewer" class="helix-product-viewer" aria-label="Location 3D model viewer" hidden>
+    <header>
+      <span aria-hidden="true">*</span>
+      <h2 id="helix-product-title">ARGUS</h2>
+      <button type="button" id="helix-product-close" aria-label="Close model viewer">×</button>
+    </header>
+    <div class="helix-product-viewport">
+      <canvas id="helix-product-canvas" aria-label="Slowly rotating Pilgrim rugged server model"></canvas>
+      <div id="helix-product-loading"><span>Loading field asset</span><output>0%</output></div>
+    </div>
+    <p id="helix-product-description">A deployable biosurveillance platform for detecting, identifying, and tracking emerging biological threats.</p>
+  </aside>
+
+  <section class="helix-readout" aria-label="Interaction instructions">
+    <p>Experiment 13 / Dual 3D glyph field</p>
+    <h1>ATCG<br>HELIX</h1>
+    <div>HOVER — ATCG MORPH<br>LEFT DRAG — ORBIT<br>RIGHT DRAG — PAN<br>SCROLL — ZOOM</div>
+  </section>
+
+  <button id="helix-gui-toggle" class="gui-toggle helix-atcg-gui-toggle" type="button" aria-expanded="false">Show GUI</button>
+
+  <section class="controls helix-controls" aria-label="DNA helix ATCG shader controls">
+    <div class="shader-control-group helix-assembly-group">
+      <div class="shader-group-label">Breakup / right → left</div>
+      <label class="control"><span class="control-label">Braid point</span><input id="helix-assembly-edge" type="range" min="0.2" max="1" value="0.48" step="0.01"><output class="readout" data-for="helix-assembly-edge"></output></label>
+      <label class="control"><span class="control-label">Transition</span><input id="helix-assembly-feather" type="range" min="0.04" max="0.4" value="0.2" step="0.01"><output class="readout" data-for="helix-assembly-feather"></output></label>
+      <label class="control"><span class="control-label">Breakup</span><input id="helix-assembly-scatter" type="range" min="0" max="1600" value="150" step="10"><output class="readout" data-for="helix-assembly-scatter"></output></label>
+      <label class="control"><span class="control-label">Particle drift</span><input id="helix-assembly-drift" type="range" min="0" max="8" value="0.36" step="0.02"><output class="readout" data-for="helix-assembly-drift"></output></label>
+    </div>
+    <div class="shader-control-group helix-palette-group">
+      <div class="shader-group-label">Particle palette</div>
+      <label class="control helix-color-control"><span class="control-label">Shadow</span><input id="helix-color-shadow" type="color" value="#003758"><output class="readout" data-for="helix-color-shadow"></output></label>
+      <label class="control helix-color-control"><span class="control-label">Low</span><input id="helix-color-low" type="color" value="#004874"><output class="readout" data-for="helix-color-low"></output></label>
+      <label class="control helix-color-control"><span class="control-label">Midtone</span><input id="helix-color-mid" type="color" value="#0065a4"><output class="readout" data-for="helix-color-mid"></output></label>
+      <label class="control helix-color-control"><span class="control-label">High</span><input id="helix-color-high" type="color" value="#59c2ff"><output class="readout" data-for="helix-color-high"></output></label>
+      <label class="control helix-color-control"><span class="control-label">Highlight</span><input id="helix-color-highlight" type="color" value="#9ff710"><output class="readout" data-for="helix-color-highlight"></output></label>
+    </div>
+    <label class="control"><span class="control-label">Glyph size</span><input id="helix-cell" type="range" min="7" max="30" value="17" step="1"><output class="readout" data-for="helix-cell"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="helix-density" type="range" min="0.05" max="1" value="1" step="0.01"><output class="readout" data-for="helix-density"></output></label>
+    <label class="control"><span class="control-label">Threshold</span><input id="helix-threshold" type="range" min="0" max="0.5" value="0.11" step="0.01"><output class="readout" data-for="helix-threshold"></output></label>
+    <label class="control"><span class="control-label">Contrast</span><input id="helix-contrast" type="range" min="0.5" max="4" value="1.85" step="0.05"><output class="readout" data-for="helix-contrast"></output></label>
+    <label class="control"><span class="control-label">Glow</span><input id="helix-glow" type="range" min="0" max="1.5" value="1.5" step="0.05"><output class="readout" data-for="helix-glow"></output></label>
+    <label class="control"><span class="control-label">ATCG radius</span><input id="helix-hover-radius" type="range" min="24" max="240" value="110" step="2"><output class="readout" data-for="helix-hover-radius"></output></label>
+    <label class="control"><span class="control-label">ATCG density</span><input id="helix-hover-density" type="range" min="0" max="1" value="1" step="0.01"><output class="readout" data-for="helix-hover-density"></output></label>
+    <label class="control"><span class="control-label">Edge breakup</span><input id="helix-hover-breakup" type="range" min="0" max="1" value="0.85" step="0.01"><output class="readout" data-for="helix-hover-breakup"></output></label>
+    <label class="control"><span class="control-label">ATCG decay</span><input id="helix-hover-decay" type="range" min="0" max="2" value="0.55" step="0.05"><output class="readout" data-for="helix-hover-decay"></output></label>
+    <label class="control"><span class="control-label">Spin</span><input id="helix-spin-speed" type="range" min="0" max="0.5" value="0.08" step="0.01"><output class="readout" data-for="helix-spin-speed"></output></label>
+    <label class="control"><span class="control-label">Zoom</span><input id="helix-zoom" type="range" min="0.8" max="16" value="5.2" step="0.1"><output class="readout" data-for="helix-zoom"></output></label>
+    <label class="shader-toggle helix-toggle"><input id="helix-auto-spin" type="checkbox" checked><span>Auto rotate</span></label>
+    <button type="button" id="helix-camera-reset" class="helix-camera-reset">Reset camera</button>
+  </section>
+</main>
+<script type="module" src="/src/studies/dna-helix.js"></script>

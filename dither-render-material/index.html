@@ -1,0 +1,54 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Material Render — Rendering Studies II</title>
+<main class="study-page dither-render-page organic-render-page material-render-page">
+  <canvas class="webgl" aria-label="Uploaded 3D model transitioning from glyph dither into physically based material lighting"></canvas>
+
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/dither-render-organic/">← 16</a><a href="/rendering-studies/">Rendering Studies II / 02</a><a class="next" href="/hover-propagation/">18 →</a>
+  </nav>
+  <div class="study-status eyebrow">PBR MATERIAL / ENVIRONMENT LIGHT → GLYPH FIELD</div>
+
+  <div id="render-loading" class="render-loading">
+    <span>Building material field</span><output>0%</output>
+  </div>
+
+  <section class="render-readout" aria-label="Experiment description">
+    <p>Experiment 17 / Material lighting</p>
+    <h1>FORM<br>REACTS</h1>
+    <div>PHYSICAL MATERIAL<br>ENVIRONMENT RESPONSE<br>DITHER — SURFACE</div>
+  </section>
+
+  <section class="controls render-controls material-render-controls" aria-label="Material render controls">
+    <div class="render-control-section">Propagation</div>
+    <label class="control"><span class="control-label">Growth</span><input id="render-progress" type="range" min="0" max="1" value="0" step="0.001"><output class="readout" data-for="render-progress"></output></label>
+    <label class="control"><span class="control-label">Speed</span><input id="render-speed" type="range" min="0.04" max="0.35" value="0.11" step="0.01"><output class="readout" data-for="render-speed"></output></label>
+    <label class="control"><span class="control-label">Glyph size</span><input id="render-cell" type="range" min="7" max="28" value="15" step="1"><output class="readout" data-for="render-cell"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="render-density" type="range" min="0.1" max="1" value="0.94" step="0.01"><output class="readout" data-for="render-density"></output></label>
+    <label class="control"><span class="control-label">Threshold</span><input id="render-threshold" type="range" min="0" max="0.5" value="0.11" step="0.01"><output class="readout" data-for="render-threshold"></output></label>
+    <label class="control"><span class="control-label">Contrast</span><input id="render-contrast" type="range" min="0.5" max="4" value="1.85" step="0.05"><output class="readout" data-for="render-contrast"></output></label>
+
+    <div class="render-control-section">PBR material</div>
+    <label class="control"><span class="control-label">Base color</span><input id="render-material-color" type="color" value="#a9b8c2"><output class="readout" data-for="render-material-color"></output></label>
+    <label class="control"><span class="control-label">Roughness</span><input id="render-roughness" type="range" min="0" max="1" value="0.42" step="0.01"><output class="readout" data-for="render-roughness"></output></label>
+    <label class="control"><span class="control-label">Metalness</span><input id="render-metalness" type="range" min="0" max="1" value="0.08" step="0.01"><output class="readout" data-for="render-metalness"></output></label>
+    <label class="control"><span class="control-label">Environment</span><input id="render-environment" type="range" min="0" max="3" value="0.8" step="0.05"><output class="readout" data-for="render-environment"></output></label>
+    <label class="control"><span class="control-label">Key light</span><input id="render-key-light" type="range" min="0" max="8" value="1.6" step="0.1"><output class="readout" data-for="render-key-light"></output></label>
+    <label class="control"><span class="control-label">Rim light</span><input id="render-rim-light" type="range" min="0" max="6" value="0.7" step="0.1"><output class="readout" data-for="render-rim-light"></output></label>
+    <label class="control"><span class="control-label">Exposure</span><input id="render-exposure" type="range" min="0.4" max="2" value="0.8" step="0.05"><output class="readout" data-for="render-exposure"></output></label>
+    <label class="shader-toggle render-toggle"><input id="render-wireframe" type="checkbox" checked><span>Wireframe surface</span></label>
+    <label class="control"><span class="control-label">Wire opacity</span><input id="render-wire-opacity" type="range" min="0.05" max="1" value="0.32" step="0.01"><output class="readout" data-for="render-wire-opacity"></output></label>
+
+    <div class="render-control-section">Frontier</div>
+    <label class="control"><span class="control-label">Outline px</span><input id="render-outline-weight" type="range" min="0.5" max="3" value="1" step="0.1"><output class="readout" data-for="render-outline-weight"></output></label>
+    <label class="control"><span class="control-label">Outline fill</span><input id="render-outline-fill" type="color" value="#010101"><output class="readout" data-for="render-outline-fill"></output></label>
+    <label class="control"><span class="control-label">Outline stroke</span><input id="render-outline-stroke" type="color" value="#1c81bd"><output class="readout" data-for="render-outline-stroke"></output></label>
+    <label class="control"><span class="control-label">Spin</span><input id="render-spin" type="range" min="0" max="0.5" value="0.08" step="0.01"><output class="readout" data-for="render-spin"></output></label>
+    <label class="control render-model-control"><span class="control-label">Model</span><input id="render-model-upload" type="file" accept=".glb,model/gltf-binary" disabled><output class="readout" data-for="render-model-upload">HELIX</output></label>
+    <button type="button" id="render-model-reset" class="render-restart render-model-reset">Reset default helix</button>
+    <label class="shader-toggle render-toggle"><input id="render-play" type="checkbox" checked><span>Auto propagate</span></label>
+    <label class="shader-toggle render-toggle"><input id="render-loop" type="checkbox" checked><span>Loop sequence</span></label>
+    <button type="button" id="render-restart" class="render-restart">Restart propagation</button>
+  </section>
+</main>
+<script type="module" src="/src/studies/dither-render.js"></script>

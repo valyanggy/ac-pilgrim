@@ -1,0 +1,38 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dither Render — Volumetric Studies</title>
+<main class="study-page dither-render-page">
+  <canvas class="webgl" aria-label="ARGUS model resolving from a glyph dither field into a fully shaded 3D render"></canvas>
+
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/dna-helix-atcg/">← 13</a><a href="/">Study 14 / Dither Render</a><a class="next" href="/dither-render-scroll/">15 →</a>
+  </nav>
+  <div class="study-status eyebrow">DITHER SHADER → 3D RENDER / TOP-DOWN RESOLVE</div>
+
+  <div id="render-loading" class="render-loading">
+    <span>Building dual render field</span><output>0%</output>
+  </div>
+
+  <div class="render-scan-label" aria-hidden="true">
+    <span id="render-scan-state">RESOLVING GEOMETRY</span>
+    <output id="render-scan-percent">000%</output>
+  </div>
+
+  <section class="render-readout" aria-label="Experiment description">
+    <p>Experiment 14 / Progressive rendering</p>
+    <h1>DITHER<br>TO FORM</h1>
+    <div>TOP — SHADED GEOMETRY<br>SCAN LINE — RENDER THRESHOLD<br>BOTTOM — GLYPH FIELD</div>
+  </section>
+
+  <section class="controls render-controls" aria-label="Dither render controls">
+    <label class="control"><span class="control-label">Resolve</span><input id="render-progress" type="range" min="0" max="1" value="0" step="0.001"><output class="readout" data-for="render-progress"></output></label>
+    <label class="control"><span class="control-label">Speed</span><input id="render-speed" type="range" min="0.04" max="0.35" value="0.13" step="0.01"><output class="readout" data-for="render-speed"></output></label>
+    <label class="control"><span class="control-label">Glyph size</span><input id="render-cell" type="range" min="7" max="28" value="15" step="1"><output class="readout" data-for="render-cell"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="render-density" type="range" min="0.1" max="1" value="0.94" step="0.01"><output class="readout" data-for="render-density"></output></label>
+    <label class="control"><span class="control-label">Spin</span><input id="render-spin" type="range" min="0" max="0.5" value="0.1" step="0.01"><output class="readout" data-for="render-spin"></output></label>
+    <label class="shader-toggle render-toggle"><input id="render-play" type="checkbox" checked><span>Auto resolve</span></label>
+    <label class="shader-toggle render-toggle"><input id="render-loop" type="checkbox" checked><span>Loop sequence</span></label>
+    <button type="button" id="render-restart" class="render-restart">Restart from dither</button>
+  </section>
+</main>
+<script type="module" src="/src/studies/dither-render.js"></script>

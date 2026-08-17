@@ -1,0 +1,20 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scan Mask 03-1 — Volumetric Studies</title>
+<main class="study-page scan-mask-page scan-mask-03-1-page">
+  <canvas class="webgl" aria-label="Airport depth image revealing a point layer through a controllable thickness slice"></canvas>
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/scan-mask/">← 03</a><a href="/">Study 03-1 / 08</a><a class="next" href="/scan-volume/">04 →</a>
+  </nav>
+  <div class="study-status eyebrow">SCAN MASK 03-1 / DEPTH THICKNESS</div>
+  <section class="controls" aria-label="Study controls">
+    <label class="control control-select"><span class="control-label">Dataset</span><select id="asset-set"><option value="subway">Subway</option><option value="mil">Military</option><option value="airport">Airport</option><option value="airport2" selected>Airport 2.0</option></select><output class="readout" data-for="asset-set">D</output></label>
+    <label class="control"><span class="control-label">Slice</span><input id="slice" type="range" min="0" max="1" value="0.9" step="0.001"><output class="readout" data-for="slice"></output></label>
+    <label class="control"><span class="control-label">Thickness</span><input id="thickness" type="range" min="0.015" max="0.42" value="0.039" step="0.001"><output class="readout" data-for="thickness"></output></label>
+    <label class="control"><span class="control-label">Feather</span><input id="feather" type="range" min="0.001" max="0.16" value="0.16" step="0.001"><output class="readout" data-for="feather"></output></label>
+    <label class="control"><span class="control-label">Depth</span><input id="depth" type="range" min="0" max="0.09" value="0.035" step="0.001"><output class="readout" data-for="depth"></output></label>
+    <label class="control"><span class="control-label">Points</span><input id="ct" type="range" min="0" max="1" value="0.27" step="0.01"><output class="readout" data-for="ct"></output></label>
+    <label class="control"><span class="control-label">Scan color</span><input id="scan-color" class="point-color" type="color" value="#003758"><output class="readout" data-for="scan-color">#003758</output></label>
+  </section>
+</main>
+<script type="module" src="/src/studies/scan-mask-03-1.js"></script>

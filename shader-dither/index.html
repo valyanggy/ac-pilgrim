@@ -1,0 +1,76 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shader Dither — Volumetric Studies</title>
+<main class="study-page shader-dither-page">
+  <section class="shader-stage" aria-label="Chest X-ray with a hover-triggered glyph field">
+    <div class="shader-image-frame" aria-hidden="true"></div>
+    <canvas class="shader-canvas" aria-label="Chest X-ray converted into a glyph dither field"></canvas>
+  </section>
+
+  <div class="shader-copy">
+    <p class="study-kicker">Experiment 10 / Cell mask</p>
+    <h1>IMAGE<br>AS SIGNAL</h1>
+    <p>The original X-ray remains visible. Hovered cells switch completely into black field and pure glyphs—one cell is either image or dither, never a translucent mixture.</p>
+  </div>
+
+  <div class="shader-axis shader-axis-x" aria-hidden="true">X / 000—640</div>
+  <div class="shader-axis shader-axis-y" aria-hidden="true">Y / 000—353</div>
+
+  <nav class="study-nav shader-ui" aria-label="Study navigation">
+    <a href="/dither-trail/">← 09</a><a href="/">Study 10 / Shader Dither</a><a class="next" href="/dna-dither/">11 →</a>
+  </nav>
+  <div class="study-status eyebrow shader-ui">2D CELL MASK / HOVER TO REPLACE IMAGE WITH GLYPHS</div>
+
+  <section class="shader-controls shader-ui" aria-label="Shader controls">
+    <div class="shader-source-status"><span id="shader-source-state">GLYPH SOURCE</span><b>DENSITY RANK / <span id="shader-glyph-count">—</span></b></div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Source image</div>
+      <div class="shader-segment shader-segment-one">
+        <label class="shader-upload-button" for="shader-image-upload">Upload image</label>
+        <input id="shader-image-upload" type="file" accept="image/*" hidden>
+      </div>
+      <div class="shader-control-head"><span>Current</span><output id="shader-image-name">DEFAULT X-RAY</output></div>
+      <div class="shader-segment shader-segment-one"><button type="button" id="shader-image-reset">Restore default</button></div>
+    </div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Structure</div>
+      <div class="shader-segment" id="shader-mode">
+        <button type="button" data-mode="grid" class="is-active">Uniform grid</button>
+        <button type="button" data-mode="quad">Quadtree</button>
+      </div>
+      <label class="control"><span class="control-label">Base cell</span><input id="shader-cell" type="range" min="6" max="20" value="12" step="1"><output class="readout" data-for="shader-cell"></output></label>
+      <label class="control"><span class="control-label">Detail</span><input id="shader-detail" type="range" min="0.02" max="0.3" value="0.1" step="0.01"><output class="readout" data-for="shader-detail"></output></label>
+      <div class="shader-control-head"><span>Max cell</span><output id="shader-max-output">4×</output></div>
+      <div class="shader-segment shader-segment-three" id="shader-max-scale">
+        <button type="button" data-scale="1">1×</button>
+        <button type="button" data-scale="2">2×</button>
+        <button type="button" data-scale="4" class="is-active">4×</button>
+      </div>
+    </div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Tone</div>
+      <label class="control"><span class="control-label">Gradation</span><input id="shader-gradation" type="range" min="2" max="37" value="37" step="1"><output class="readout" data-for="shader-gradation"></output></label>
+      <label class="control"><span class="control-label">Black</span><input id="shader-black" type="range" min="0" max="0.2" value="0.06" step="0.005"><output class="readout" data-for="shader-black"></output></label>
+      <label class="control"><span class="control-label">White</span><input id="shader-white" type="range" min="0.25" max="1" value="0.9" step="0.01"><output class="readout" data-for="shader-white"></output></label>
+      <label class="control"><span class="control-label">Glyph scale</span><input id="shader-glyph-scale" type="range" min="0.4" max="1" value="0.9" step="0.01"><output class="readout" data-for="shader-glyph-scale"></output></label>
+      <label class="shader-toggle"><input id="shader-invert" type="checkbox" checked><span>Invert (bright = dense)</span></label>
+    </div>
+
+    <div class="shader-control-group">
+      <div class="shader-group-label">Glyph color by value</div>
+      <div class="shader-segment shader-segment-three" id="shader-ramp">
+        <button type="button" data-ramp="blue" class="is-active">Blue</button>
+        <button type="button" data-ramp="green">Green</button>
+        <button type="button" data-ramp="mono">B&amp;W</button>
+      </div>
+      <div class="shader-ramp-preview" id="shader-ramp-preview" aria-label="Current six-color luminance ramp"></div>
+      <label class="control"><span class="control-label">Hover radius</span><input id="shader-radius" type="range" min="30" max="140" value="72" step="1"><output class="readout" data-for="shader-radius"></output></label>
+      <label class="control"><span class="control-label">Decay</span><input id="shader-life" type="range" min="0.3" max="2.5" value="1.25" step="0.05"><output class="readout" data-for="shader-life"></output></label>
+      <div class="shader-control-head"><span>Rendered cells</span><output id="shader-cell-count">—</output></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="/src/studies/shader-dither.js"></script>

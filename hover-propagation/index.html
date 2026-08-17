@@ -1,0 +1,38 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hover Propagation — Rendering Studies II</title>
+<main class="study-page hover-propagation-page">
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/dither-render-material/">← 17</a>
+    <a href="/rendering-studies/">Rendering Studies II / 03</a>
+    <a class="next" href="/video-dither-relay/">19 →</a>
+  </nav>
+
+  <div class="study-status eyebrow">POINTER PROXIMITY → LOCAL GLYPH FIELD</div>
+
+  <section class="hover-stage" aria-label="Interactive hover propagation study">
+    <button class="propagation-button" type="button" aria-label="Explore Argus">
+      <span class="propagation-label"><img class="propagation-label-mark" src="/assets/explore-logomark.svg" alt="EXPLORE"></span>
+      <span class="propagation-product">
+        <img class="propagation-product-mark" src="/assets/argus-logomark.svg" alt="ARGUS">
+        <img class="propagation-product-mark propagation-product-mark-active" src="/assets/argus-logomark.svg" alt="" aria-hidden="true">
+      </span>
+      <canvas class="propagation-canvas" aria-hidden="true"></canvas>
+    </button>
+  </section>
+
+  <section class="render-readout hover-readout" aria-label="Experiment description">
+    <p>Experiment 18 / Hover propagation</p>
+    <h1>STAY<br>NEARBY</h1>
+    <div>POINTER PROXIMITY<br>SHORT GLYPH TRAIL<br>2D — INTERACTION</div>
+  </section>
+
+  <section class="controls hover-controls" aria-label="Hover propagation controls">
+    <label class="control"><span class="control-label">Trail life</span><input id="hover-life" type="range" min="0.2" max="1.8" value="0.72" step="0.02"><output class="readout" data-for="hover-life"></output></label>
+    <label class="control"><span class="control-label">Base cell</span><input id="hover-cell" type="range" min="14" max="60" value="24" step="1"><output class="readout" data-for="hover-cell"></output></label>
+    <label class="control"><span class="control-label">Bleed radius</span><input id="hover-radius" type="range" min="80" max="300" value="170" step="2"><output class="readout" data-for="hover-radius"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="hover-density" type="range" min="0.2" max="1" value="0.82" step="0.01"><output class="readout" data-for="hover-density"></output></label>
+    <label class="control"><span class="control-label">Glyph color</span><input id="hover-color" type="color" value="#1c81bd"><output class="readout" data-for="hover-color"></output></label>
+  </section>
+</main>
+<script type="module" src="/src/studies/hover-propagation.js"></script>

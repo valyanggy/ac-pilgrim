@@ -1,0 +1,49 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNA Helix Shader — Volumetric Studies</title>
+<main class="study-page dna-helix-page">
+  <canvas class="webgl" aria-label="Interactive DNA double helix rendered as a Pilgrim glyph field"></canvas>
+
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/dna-dither/">← 11</a><a href="/">Study 12 / DNA Helix</a><a class="next" href="/dna-helix-atcg/">13 →</a>
+  </nav>
+  <div class="study-status eyebrow">3D GLYPH SHADER / ORBIT · PAN · ZOOM</div>
+
+  <div id="helix-loading" class="helix-loading">
+    <span>Loading DNA geometry</span><output>0%</output>
+  </div>
+
+  <div id="helix-hotspots" class="helix-hotspots" aria-label="DNA camera points">
+    <button type="button" class="helix-hotspot is-left" data-hotspot="0" aria-label="Focus camera on Pilgrim Argus">
+      <span class="helix-hotspot-marker" aria-hidden="true"></span>
+      <span class="helix-hotspot-banner"><span>PILGRIM</span><b>ARGUS</b></span>
+    </button>
+    <button type="button" class="helix-hotspot is-right" data-hotspot="1" aria-label="Focus camera on Pilgrim Kingsfoil">
+      <span class="helix-hotspot-marker" aria-hidden="true"></span>
+      <span class="helix-hotspot-banner"><span>PILGRIM</span><b>KINGSFOIL</b></span>
+    </button>
+    <button type="button" class="helix-hotspot is-left" data-hotspot="2" aria-label="Focus camera on Pilgrim Biocore">
+      <span class="helix-hotspot-marker" aria-hidden="true"></span>
+      <span class="helix-hotspot-banner"><span>PILGRIM</span><b>BIOCORE</b></span>
+    </button>
+  </div>
+
+  <section class="helix-readout" aria-label="Interaction instructions">
+    <p>Experiment 12 / 3D signal field</p>
+    <h1>DNA<br>HELIX</h1>
+    <div>LEFT DRAG — ORBIT<br>RIGHT DRAG — PAN<br>SCROLL — ZOOM</div>
+  </section>
+
+  <section class="controls helix-controls" aria-label="DNA helix shader controls">
+    <label class="control"><span class="control-label">Glyph size</span><input id="helix-cell" type="range" min="7" max="30" value="17" step="1"><output class="readout" data-for="helix-cell"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="helix-density" type="range" min="0.05" max="1" value="1" step="0.01"><output class="readout" data-for="helix-density"></output></label>
+    <label class="control"><span class="control-label">Threshold</span><input id="helix-threshold" type="range" min="0" max="0.5" value="0.11" step="0.01"><output class="readout" data-for="helix-threshold"></output></label>
+    <label class="control"><span class="control-label">Contrast</span><input id="helix-contrast" type="range" min="0.5" max="4" value="1.85" step="0.05"><output class="readout" data-for="helix-contrast"></output></label>
+    <label class="control"><span class="control-label">Glow</span><input id="helix-glow" type="range" min="0" max="1.5" value="1.5" step="0.05"><output class="readout" data-for="helix-glow"></output></label>
+    <label class="control"><span class="control-label">Spin</span><input id="helix-spin-speed" type="range" min="0" max="0.5" value="0.08" step="0.01"><output class="readout" data-for="helix-spin-speed"></output></label>
+    <label class="control"><span class="control-label">Zoom</span><input id="helix-zoom" type="range" min="0.8" max="16" value="3" step="0.1"><output class="readout" data-for="helix-zoom"></output></label>
+    <label class="shader-toggle helix-toggle"><input id="helix-auto-spin" type="checkbox"><span>Auto rotate</span></label>
+    <button type="button" id="helix-camera-reset" class="helix-camera-reset">Reset camera</button>
+  </section>
+</main>
+<script type="module" src="/src/studies/dna-helix.js"></script>

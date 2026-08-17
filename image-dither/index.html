@@ -1,0 +1,43 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Dither — Rendering Studies II</title>
+<main class="study-page video-dither-page image-dither-page is-recording-clean">
+  <canvas class="webgl video-dither-canvas image-dither-canvas" aria-label="Uploaded image translated into a five-color Pilgrim glyph dither"></canvas>
+
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/video-dither-relay/">← 19</a>
+    <a href="/rendering-studies/">Rendering Studies II / 05</a>
+    <a class="next" href="/ring-scan/">21 →</a>
+  </nav>
+
+  <div class="study-status eyebrow">IMAGE INPUT → FIVE-BAND GLYPH DITHER</div>
+
+  <div id="image-dither-loading" class="render-loading">
+    <span>Preparing image glyph field</span><output>LOAD</output>
+  </div>
+
+  <div class="image-dither-status" aria-live="polite">
+    <span>Source</span><output id="image-dither-source-name">DEFAULT IMAGE</output>
+  </div>
+
+  <button id="image-dither-gui-toggle" class="gui-toggle video-dither-gui" type="button" aria-pressed="true">Show GUI · H</button>
+
+  <section class="controls render-controls video-dither-controls image-dither-controls" aria-label="Image dither controls">
+    <div class="render-control-section">Image source</div>
+    <label class="control image-dither-file-control"><span class="control-label">Image</span><input id="image-dither-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><output class="readout" data-for="image-dither-file">CHOOSE</output></label>
+    <div class="render-control-section">Dither field</div>
+    <label class="control"><span class="control-label">Cell size</span><input id="image-dither-cell" type="range" min="7" max="30" value="13" step="1"><output class="readout" data-for="image-dither-cell"></output></label>
+    <label class="control"><span class="control-label">Contrast</span><input id="image-dither-contrast" type="range" min="0.5" max="3.5" value="1.55" step="0.05"><output class="readout" data-for="image-dither-contrast"></output></label>
+    <label class="control"><span class="control-label">Black cutoff</span><input id="image-dither-black-cutoff" type="range" min="0" max="0.5" value="0.08" step="0.01"><output class="readout" data-for="image-dither-black-cutoff"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="image-dither-density" type="range" min="0.05" max="1" value="1" step="0.01"><output class="readout" data-for="image-dither-density"></output></label>
+    <div class="render-control-section">Five-color ramp</div>
+    <label class="control"><span class="control-label">Shadow</span><input id="image-dither-color-1" type="color" value="#001624"><output class="readout" data-for="image-dither-color-1"></output></label>
+    <label class="control"><span class="control-label">Low</span><input id="image-dither-color-2" type="color" value="#003758"><output class="readout" data-for="image-dither-color-2"></output></label>
+    <label class="control"><span class="control-label">Midtone</span><input id="image-dither-color-3" type="color" value="#004874"><output class="readout" data-for="image-dither-color-3"></output></label>
+    <label class="control"><span class="control-label">High</span><input id="image-dither-color-4" type="color" value="#0065a4"><output class="readout" data-for="image-dither-color-4"></output></label>
+    <label class="control"><span class="control-label">Highlight</span><input id="image-dither-color-5" type="color" value="#59c2ff"><output class="readout" data-for="image-dither-color-5"></output></label>
+  </section>
+
+  <button id="image-dither-drop" class="image-dither-drop" type="button">Drop image / click frame</button>
+</main>
+<script type="module" src="/src/studies/image-dither.js"></script>

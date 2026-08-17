@@ -1,0 +1,21 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Human Volume — Volumetric Studies</title>
+<main class="study-page">
+  <canvas class="webgl" aria-label="Interactive volumetric anatomical head scan"></canvas>
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/screen-dither/">← Previous</a><a href="/">Study 02 / 04</a><a class="next" href="/point-cloud-focus/">Next →</a>
+  </nav>
+  <div class="study-status eyebrow">PROCEDURAL VOLUME / CORONAL</div>
+  <section class="study-copy">
+    <p class="study-kicker">Human / Volume</p>
+    <h1>A body is<br>also a field.</h1>
+    <p>A synthetic anatomical volume is revealed by a moving coronal section; structure appears only at the plane of inquiry.</p>
+  </section>
+  <section class="controls" aria-label="Study controls">
+    <label class="control"><span class="control-label">Section</span><input id="slice" type="range" min="-1.4" max="1.4" value="0" step="0.01"><output class="readout" data-for="slice"></output></label>
+    <label class="control"><span class="control-label">Thickness</span><input id="width" type="range" min="0.03" max="0.55" value="0.16" step="0.01"><output class="readout" data-for="width"></output></label>
+    <label class="control"><span class="control-label">Rotation</span><input id="rotation" type="range" min="-1" max="1" value="0" step="0.01"><output class="readout" data-for="rotation"></output></label>
+  </section>
+</main>
+<script type="module" src="/src/studies/human-volume.js"></script>

@@ -1,0 +1,21 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Point Cloud Focus — Volumetric Studies</title>
+<main class="study-page">
+  <canvas class="webgl" aria-label="Interactive semantic point cloud with variable focus depth"></canvas>
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/human-volume/">← Previous</a><a href="/">Study 03 / 04</a><a class="next" href="/dither-volume/">Next →</a>
+  </nav>
+  <div class="study-status eyebrow">SEMANTIC RESOLUTION / FOCUS FIELD</div>
+  <section class="study-copy">
+    <p class="study-kicker">Point Cloud / Focus</p>
+    <h1>Clarity follows<br>attention.</h1>
+    <p>The selected depth resolves into evidence. Everything beyond it remains a sparse spatial hypothesis.</p>
+  </section>
+  <section class="controls" aria-label="Study controls">
+    <label class="control"><span class="control-label">Focus</span><input id="focus" type="range" min="-4" max="4" value="0.4" step="0.01"><output class="readout" data-for="focus"></output></label>
+    <label class="control"><span class="control-label">Falloff</span><input id="falloff" type="range" min="0.2" max="3" value="1.1" step="0.01"><output class="readout" data-for="falloff"></output></label>
+    <label class="control"><span class="control-label">Signal</span><input id="signal" type="range" min="0" max="1" value="0.75" step="0.01"><output class="readout" data-for="signal"></output></label>
+  </section>
+</main>
+<script type="module" src="/src/studies/point-cloud-focus.js"></script>

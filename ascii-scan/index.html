@@ -1,0 +1,37 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASCII Scan — Volumetric Studies</title>
+<main class="study-page gaussian-scan-page ascii-scan-page is-gui-hidden">
+  <canvas class="webgl" aria-label="An interactive point cloud scan rendered through ASCII post-processing"></canvas>
+  <nav class="study-nav" aria-label="Study navigation">
+    <a href="/gaussian-scan/">← 06</a><a href="/">Study 07 / 08</a><a class="next" href="/mesh-scan/">08 →</a>
+  </nav>
+  <div class="study-status eyebrow">ASCII POST / POINT SCAN</div>
+  <div id="gaussian-loading" class="gaussian-loading"><span>Loading splats</span><output>0%</output></div>
+  <div class="origin-instruction"><span>Click points</span> to set origin · drag to orbit</div>
+  <div class="phase-readout" aria-live="polite"><span id="phase-index">01</span><span id="phase-name">Volume descent</span></div>
+  <button id="gui-toggle" class="gui-toggle gaussian-gui" type="button" aria-expanded="false">Show GUI</button>
+  <section class="controls gaussian-controls" aria-label="Study controls">
+    <div class="control model-control">
+      <span class="control-label">Model</span>
+      <div class="model-tabs" role="tablist" aria-label="Point cloud model">
+        <button type="button" role="tab" data-model="sharp">Sharp</button>
+        <button type="button" role="tab" data-model="original">Original</button>
+      </div>
+      <output class="readout">PLY</output>
+    </div>
+    <label class="control"><span class="control-label">Timeline</span><input id="timeline" type="range" min="0" max="1" value="0" step="0.001"><output class="readout" data-for="timeline"></output></label>
+    <label class="control"><span class="control-label">Scan height</span><input id="scan-height" type="range" min="2" max="20" value="11" step="0.1"><output class="readout" data-for="scan-height"></output></label>
+    <label class="control"><span class="control-label">Object radius</span><input id="object-radius" type="range" min="1" max="14" value="5" step="0.1"><output class="readout" data-for="object-radius"></output></label>
+    <label class="control"><span class="control-label">Ground Y</span><input id="ground-y" type="range" min="-1.5" max="1.5" value="-0.45" step="0.01"><output class="readout" data-for="ground-y"></output></label>
+    <label class="control"><span class="control-label">Thickness</span><input id="thickness" type="range" min="0.08" max="1.2" value="0.32" step="0.01"><output class="readout" data-for="thickness"></output></label>
+    <label class="control"><span class="control-label">Point size</span><input id="point-size" type="range" min="0.5" max="4" value="1.35" step="0.05"><output class="readout" data-for="point-size"></output></label>
+    <label class="control"><span class="control-label">Density</span><input id="density" type="range" min="0.03" max="1" value="0.28" step="0.01"><output class="readout" data-for="density"></output></label>
+    <label class="control"><span class="control-label">Glyph size</span><input id="glyph-size" type="range" min="5" max="20" value="9" step="1"><output class="readout" data-for="glyph-size"></output></label>
+    <label class="control"><span class="control-label">Contrast</span><input id="ascii-contrast" type="range" min="0.5" max="2.5" value="1.35" step="0.05"><output class="readout" data-for="ascii-contrast"></output></label>
+    <label class="control"><span class="control-label">ASCII mix</span><input id="ascii-mix" type="range" min="0" max="1" value="1" step="0.01"><output class="readout" data-for="ascii-mix"></output></label>
+    <label class="control"><span class="control-label">Spread</span><input id="spread" type="range" min="6" max="52" value="30" step="0.5"><output class="readout" data-for="spread"></output></label>
+    <label class="control"><span class="control-label">Zoom</span><input id="zoom" type="range" min="28" max="110" value="58" step="1"><output class="readout" data-for="zoom"></output></label>
+  </section>
+</main>
+<script type="module" src="/src/studies/ascii-scan.js"></script>

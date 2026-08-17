@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#02090d" />
+    <title>ARGUS / Hero Sequence 07-2</title>
+    <link rel="stylesheet" href="../hero-storyboard/styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="storyboard video-storyboard" aria-label="Argus video-layer hero storyboard">
+      <section class="hero-stage is-depth-gui-hidden is-pair-gui-hidden" id="heroStage" data-frame="1" aria-live="polite">
+        <canvas id="sceneCanvas" aria-hidden="true"></canvas>
+        <img class="airport-scan-base" src="/assets/hero-home-pilgrim.png" alt="" aria-hidden="true" />
+        <video id="videoPeopleSource" class="video-people-source" muted loop playsinline preload="auto" aria-label="Moving people video with a zoom and fade entrance">
+          <source src="/assets/hero-storyboard-07-2-people.mp4" type="video/mp4" />
+        </video>
+        <canvas id="heroMeshCanvas" class="hero-mesh-canvas" aria-label="Argus ordered point-cloud scan"></canvas>
+        <div class="scanlines" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+
+        <nav class="storyboard-nav" aria-label="Study navigation">
+          <a href="/hero-storyboard/">← 07</a>
+          <a href="/rendering-studies/">Rendering Studies II / 07-2</a>
+          <a class="next" href="/rendering-studies/">Index ↗</a>
+        </nav>
+
+        <!-- <header class="system-header hud-layer">
+          <div class="system-state"><i></i><span id="systemState">SYSTEM / STANDBY</span></div>
+        </header> -->
+
+        <div class="device-scene scene-layer" aria-hidden="true">
+          <div class="point-field"></div>
+          <div class="device">
+            <div class="device-rim"></div>
+            <div class="device-screen"><span>ARGUS</span><i></i></div>
+            <div class="device-status">AIRBORNE INTELLIGENCE</div>
+          </div>
+          <p class="scene-caption">AN AUTONOMOUS BIOAEROSOL<br />DETECTION NETWORK</p>
+        </div>
+
+        <div class="vision-scene scene-layer">
+          <div class="vision-label hud-layer"><i></i> OPTICAL FIELD / ACTIVE</div>
+          <div class="reticle hud-layer" aria-hidden="true"><span></span></div>
+          <div class="bracket bracket-left hud-layer"></div>
+          <div class="bracket bracket-right hud-layer"></div>
+          <div class="azimuth hud-layer"><b>−30</b><i></i><b>0</b><i></i><b>30</b></div>
+          <div class="detection-log hud-layer">
+            <span>DETECTION LOG</span>
+            <p>08:41:52 PARTICULATE · CLEARED<br />08:42:03 INFLUENZA · 61.0μ<br />08:42:16 RHINOVIRUS · 23.5μ</p>
+          </div>
+          <div class="environment hud-layer">TEMP 21.4°C&nbsp;&nbsp; HUM 44%<br />08:42:17</div>
+          <div class="threat-meter hud-layer">
+            <span>THREAT LEVEL</span><strong>ELEVATED</strong>
+            <div><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <p class="interaction-hint hud-layer"><span></span> HOVER A PARTICLE TO ISOLATE</p>
+          <div id="pathogenLayer" class="pathogen-layer" aria-label="Airborne particles"></div>
+        </div>
+
+        <div class="figma-hud" aria-hidden="true">
+          <img class="figma-hud-grid" src="/assets/figma/argus-hud/grid.svg" alt="" />
+
+          <div class="figma-hud-status"><i></i><span>SCANNING IN PROGRESS</span></div>
+          <img class="figma-hud-caliber" src="/assets/figma/argus-hud/caliber.svg" alt="" />
+          <div class="figma-hud-target">
+            <img class="target-frame" src="/assets/figma/argus-hud/target-frame.svg" alt="" />
+            <img class="target-crosshair" src="/assets/figma/argus-hud/crosshair.svg" alt="" />
+          </div>
+
+          <div class="figma-hud-threat">
+            <span>THREAT LEVEL</span>
+            <strong>ELEVATED</strong>
+            <div><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+
+        <div class="pair-scan-scene scene-layer" aria-label="Two-image pathogen style scan">
+          <div class="pair-scan-specimen">
+            <img class="pair-scan-image pair-scan-image-a" data-pair-slot="a" src="/assets/pathogen-scan-pairs/1.svg" alt="" aria-hidden="true" />
+            <img class="pair-scan-realistic-source" data-pair-slot="b" src="/assets/pathogen-scan-pairs/1.png" alt="" aria-hidden="true" />
+            <canvas class="pair-scan-image pair-scan-image-b" aria-label="Realistic pathogen rendered with the Ring Scan glyph set"></canvas>
+          </div>
+          <img class="pair-scan-line" src="/assets/figma/pair-scan/scan-line.svg" alt="" aria-hidden="true" />
+
+          <div class="pair-scan-library" aria-hidden="true">
+            <img data-pair="1" src="/assets/pathogen-scan-pairs/1.png" alt="" />
+            <img data-pair="2" src="/assets/pathogen-scan-pairs/2.png" alt="" />
+            <img data-pair="3" src="/assets/pathogen-scan-pairs/3.png" alt="" />
+            <img data-pair="1" src="/assets/pathogen-scan-pairs/1.png" alt="" />
+            <img data-pair="2" src="/assets/pathogen-scan-pairs/2.png" alt="" />
+          </div>
+
+          <div class="pair-detected-card">
+            <div class="pair-detected-head"><b>*</b><span>Matching...</span></div>
+            <span class="pair-detected-via">via ARGUS</span>
+            <img data-detected-image src="/assets/pathogen-scan-pairs/1.png" alt="Detected pathogen" />
+            <div class="pair-detected-foot"><span>VIRUS BN-13</span><b>+</b></div>
+          </div>
+        </div>
+
+        <button id="pairScanGuiToggle" class="pair-scan-gui-toggle" type="button" aria-expanded="false">Show GUI</button>
+        <section class="pair-scan-gui" aria-label="Frame 05 glyph scan controls">
+          <header><span>Ring scan / glyph</span><output>36 SVG ATLAS</output></header>
+          <label><span>Glyph size</span><input id="pairGlyphCell" type="range" min="7" max="28" value="8" step="1"><output data-pair-output="cell">8 PX</output></label>
+          <label><span>Density</span><input id="pairGlyphDensity" type="range" min="0.1" max="1" value="1" step="0.01"><output data-pair-output="density">100%</output></label>
+          <label><span>Threshold</span><input id="pairGlyphThreshold" type="range" min="0" max="1" value="0.31" step="0.01"><output data-pair-output="threshold">0.31</output></label>
+          <label><span>Contrast</span><input id="pairGlyphContrast" type="range" min="0.1" max="10" value="4.3" step="0.05"><output data-pair-output="contrast">4.30×</output></label>
+          <div class="pair-scan-gui-section">Dynamic noise</div>
+          <label><span>Amount</span><input id="pairNoiseAmount" type="range" min="0" max="0.4" value="0.08" step="0.01"><output data-pair-output="noiseAmount">8%</output></label>
+          <label><span>Speed</span><input id="pairNoiseRate" type="range" min="1" max="20" value="7" step="1"><output data-pair-output="noiseRate">7 HZ</output></label>
+          <label><span>Glyph range</span><input id="pairNoiseRange" type="range" min="0" max="6" value="2" step="1"><output data-pair-output="glyphRange">2</output></label>
+          <div class="pair-scan-gui-section">Dither palette</div>
+          <label><span>Shadow</span><input class="pair-glyph-color" data-pair-color="0" type="color" value="#616161"><output>#616161</output></label>
+          <label><span>Low</span><input class="pair-glyph-color" data-pair-color="1" type="color" value="#616161"><output>#616161</output></label>
+          <label><span>Midtone</span><input class="pair-glyph-color" data-pair-color="2" type="color" value="#616161"><output>#616161</output></label>
+          <label><span>High</span><input class="pair-glyph-color" data-pair-color="3" type="color" value="#ff0000"><output>#FF0000</output></label>
+          <label><span>Highlight</span><input class="pair-glyph-color" data-pair-color="4" type="color" value="#ffffff"><output>#FFFFFF</output></label>
+        </section>
+
+        <div class="final-frame-scene scene-layer" aria-hidden="true">
+          <div class="final-frame-capture">
+            <canvas id="finalFrameVideo" aria-hidden="true"></canvas>
+            <div id="finalFramePair" class="final-frame-pair" aria-hidden="true"></div>
+            <div class="final-frame-progressive-blur" aria-hidden="true"></div>
+          </div>
+          <img class="final-frame-logo" src="/assets/figma/final-frame/pilgrim-logo.svg" alt="Pilgrim" />
+          <h1 class="final-frame-title">DETECT PANDEMICS<br />BEFORE THEY BEGIN</h1>
+        </div>
+
+        <button id="depthGuiToggle" class="depth-gui-toggle" type="button" aria-expanded="false">Show GUI</button>
+        <section id="depthGui" class="depth-gui" aria-label="Depth travel controls">
+          <header><span>Depth travel</span><output id="depthSequence">ARGUS → PEOPLE</output></header>
+          <label><span>Travel</span><input id="depthTravel" type="range" min="0" max="1" value="0" step="0.001"><output data-depth-output="travel">0%</output></label>
+          <label><span>Scan timing</span><input id="depthScanTiming" type="range" min="-4" max="4" value="0" step="0.05"><output data-depth-output="scanTiming">+0.0</output></label>
+          <label><span>Scan speed</span><input id="depthScanSpeed" type="range" min="0.4" max="2.4" value="1" step="0.01"><output data-depth-output="scanSpeed">1.00×</output></label>
+          <label><span>Far points</span><input id="depthFarPoints" type="range" min="0.15" max="1" value="0.65" step="0.01"><output data-depth-output="farPoints">65%</output></label>
+          <label><span>Image gap</span><input id="depthImageGap" type="range" min="16" max="40" value="28" step="0.1"><output data-depth-output="imageGap">28.0 Z</output></label>
+          <label><span>Points</span><input id="depthDensity" type="range" min="0.05" max="1" value="0.27" step="0.01"><output data-depth-output="density">27%</output></label>
+          <label><span>Color</span><input id="depthColor" type="color" value="#003758"><output data-depth-output="color">#003758</output></label>
+          <label><span>Thickness</span><input id="depthWidth" type="range" min="0.005" max="0.2" value="0.039" step="0.001"><output data-depth-output="width">0.039</output></label>
+          <label><span>Depth</span><input id="depthAmount" type="range" min="0.5" max="6.5" value="6.5" step="0.01"><output data-depth-output="depth">6.5×</output></label>
+        </section>
+
+      </section>
+
+      <nav class="story-controls" aria-label="Storyboard frame controls">
+        <button class="play-button" id="playButton" type="button" aria-label="Play sequence"><span>▶</span></button>
+        <div class="timeline" id="timeline" role="tablist" aria-label="Sequence frames"></div>
+        <div class="control-meta">
+          <div class="frame-index"><span id="frameNumber">01</span> / 06</div>
+          <button class="stage-next" id="stageNext" type="button" aria-label="Next frame">NEXT <span>→</span></button>
+        </div>
+      </nav>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
