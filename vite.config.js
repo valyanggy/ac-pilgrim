@@ -31,6 +31,7 @@ export default defineConfig({
         ringScan: resolve(import.meta.dirname, 'ring-scan/index.html'),
         heroStoryboard: resolve(import.meta.dirname, 'hero-storyboard/index.html'),
         heroStoryboard072: resolve(import.meta.dirname, 'hero-storyboard-07-2/index.html'),
+        heroStoryboard073: resolve(import.meta.dirname, 'hero-storyboard-07-3/index.html'),
         renderingStudies: resolve(import.meta.dirname, 'rendering-studies/index.html')
       }
     }

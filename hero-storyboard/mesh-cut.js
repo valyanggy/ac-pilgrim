@@ -346,9 +346,12 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
   let pausedAt = 0;
   let completed = false;
   let currentTravel = 0;
+  let depthHandoffProgress = 0;
+  let depthSequenceStart = 0;
   const sequenceDuration = 3500;
   const depthSequenceDuration = 2600;
   const isVideoStoryboard = document.querySelector('.video-storyboard') !== null;
+  const isFeedbackStoryboard = document.querySelector('.feedback-storyboard') !== null;
   const handoffCameraDistance = isVideoStoryboard ? 3.45 : 5.575;
   const pointerTarget = new THREE.Vector2();
   const pointerCurrent = new THREE.Vector2();
@@ -382,12 +385,13 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
     mode = 'scan';
     completed = false;
     pausedAt = 0;
-    startedAt = performance.now() + 250;
+    startedAt = performance.now() + (isFeedbackStoryboard ? 80 : 250);
     uniforms.uSlice.value = 1.8;
     uniforms.uOpacity.value = 1;
     depthUniforms.uOpacity.value = 0;
     depthUniforms.uSlice.value = .9;
     currentTravel = 0;
+    depthHandoffProgress = 0;
     onDepthReveal?.(0);
     if (depthCloud) depthCloud.position.z = -depthControls.imageGap;
     onTravel?.(0);
@@ -415,7 +419,9 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
     }
     depthUniforms.uSlice.value = THREE.MathUtils.lerp(.9, .55, sliceProgress);
     if (transitioning) {
-      depthUniforms.uOpacity.value = THREE.MathUtils.smoothstep(currentTravel, .03, .58);
+      depthUniforms.uOpacity.value = isFeedbackStoryboard
+        ? 0
+        : THREE.MathUtils.smoothstep(currentTravel, .03, .58);
       onDepthReveal?.(THREE.MathUtils.smoothstep(currentTravel, .02, .72));
     }
     if (cameraProgress !== null) {
@@ -433,13 +439,13 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
     pausedAt = 0;
     mode = 'depth-scan';
     startedAt = performance.now();
+    depthSequenceStart = depthHandoffProgress;
     uniforms.uOpacity.value = 0;
     depthUniforms.uOpacity.value = 0;
     depthUniforms.uSlice.value = 1.15;
-    currentTravel = 0;
+    currentTravel = depthSequenceStart;
     if (depthCloud) depthCloud.position.z = -depthControls.imageGap;
-    onTravel?.(0);
-    onDepthReveal?.(0);
+    applyDepthTravel(depthSequenceStart, true, 0, depthSequenceStart);
     camera.position.copy(cameraDirection).multiplyScalar(handoffCameraDistance);
   }
 
@@ -455,14 +461,20 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
     if (running && mode === 'scan') {
       const elapsed = now - startedAt;
       if (elapsed >= 0) {
-        const master = THREE.MathUtils.clamp(elapsed / sequenceDuration, 0, 1);
+        const scanDuration = sequenceDuration / Math.max(.4, depthControls.scanSpeed);
+        const master = THREE.MathUtils.clamp(elapsed / scanDuration, 0, 1);
         const sharedScan = master;
-        const modelFade = 1 - smoothRange(master, isVideoStoryboard ? .9 : .78, 1);
+        const modelFade = 1 - smoothRange(master, isFeedbackStoryboard ? .68 : isVideoStoryboard ? .9 : .78, 1);
 
         uniforms.uSlice.value = THREE.MathUtils.lerp(1.8, -1.95, sharedScan);
         uniforms.uOpacity.value = modelFade;
-        depthUniforms.uOpacity.value = 0;
-        onDepthReveal?.(0);
+        if (isFeedbackStoryboard) {
+          depthHandoffProgress = smoothRange(master, .4, 1) * .6;
+          applyDepthTravel(depthHandoffProgress, true, null, depthHandoffProgress);
+        } else {
+          depthUniforms.uOpacity.value = 0;
+          onDepthReveal?.(0);
+        }
         camera.position.copy(cameraDirection).multiplyScalar(THREE.MathUtils.lerp(11.7, handoffCameraDistance, master));
 
         if (master >= 1) {
@@ -476,13 +488,15 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
       }
     }
     if (running && mode === 'depth-scan') {
-      const master = THREE.MathUtils.clamp((now - startedAt) / depthSequenceDuration, 0, 1);
+      const scanDuration = depthSequenceDuration / Math.max(.4, depthControls.scanSpeed);
+      const master = THREE.MathUtils.clamp((now - startedAt) / scanDuration, 0, 1);
+      const travelProgress = THREE.MathUtils.lerp(depthSequenceStart, 1, master);
       uniforms.uOpacity.value = 0;
-      applyDepthTravel(master, true, master, master);
+      applyDepthTravel(travelProgress, true, master, travelProgress);
       if (master >= 1) {
         running = false;
         mode = 'depth';
-        depthUniforms.uOpacity.value = 1;
+        depthUniforms.uOpacity.value = isFeedbackStoryboard ? 0 : 1;
         onDepthReveal?.(1);
       }
     }
@@ -542,6 +556,8 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
       depthUniforms.uOpacity.value = 0;
       onDepthReveal?.(0);
       currentTravel = 0;
+      depthHandoffProgress = 0;
+      depthSequenceStart = 0;
       onTravel?.(0);
       camera.position.copy(cameraDirection).multiplyScalar(11.7);
     },

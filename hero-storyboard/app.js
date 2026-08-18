@@ -13,7 +13,9 @@ const matchReadout = document.querySelector('#matchReadout');
 const analysisTitle = document.querySelector('#analysisTitle');
 const depthTravelInput = document.querySelector('#depthTravel');
 const depthGuiToggle = document.querySelector('#depthGuiToggle');
+const focusThreatImage = document.querySelector('#focusThreatImage');
 const isVideoStoryboard = document.querySelector('.video-storyboard') !== null;
+const isFeedbackStoryboard = document.querySelector('.feedback-storyboard') !== null;
 
 const originalFrames = [
   { title: 'ARGUS SCAN', state: 'POINT MODEL / ACTIVE', duration: 7000 },
@@ -27,7 +29,17 @@ const originalFrames = [
   { title: 'RESOLVE', state: 'SYSTEM / CONTINUOUS', duration: 5000 },
 ];
 
-const frames = isVideoStoryboard
+const frames = isFeedbackStoryboard
+  ? [
+      originalFrames[0],
+      originalFrames[1],
+      { ...originalFrames[2], duration: 600 },
+      originalFrames[3],
+      { title: 'PAIR SCAN', state: 'CHARACTERIZATION IN PROGRESS', duration: 3000 },
+      { title: 'CHARACTERIZED', state: 'PATHOGEN CHARACTERIZED', duration: 950 },
+      { title: 'RESOLVE', state: 'PATHOGEN CHARACTERIZED', duration: 5000 },
+    ]
+  : isVideoStoryboard
   ? [
       originalFrames[0],
       originalFrames[1],
@@ -74,6 +86,7 @@ const depthControlBindings = [
 
 depthControlBindings.forEach(([id, key, format]) => {
   const input = document.querySelector(`#${id}`);
+  heroMeshCut.setDepthControls({ [key]: Number(input.value) });
   input.addEventListener('input', () => {
     const value = Number(input.value);
     document.querySelector(`[data-depth-output="${key}"]`).textContent = format(value);
@@ -86,6 +99,7 @@ document.querySelector('#depthColor').addEventListener('input', event => {
   document.querySelector('[data-depth-output="color"]').textContent = color.toUpperCase();
   heroMeshCut.setDepthControls({ color });
 });
+heroMeshCut.setDepthControls({ color: document.querySelector('#depthColor').value });
 
 depthTravelInput.addEventListener('input', () => {
   const value = Number(depthTravelInput.value);
@@ -104,27 +118,29 @@ const pathogenPaths = [
   'M13 21c11-11 21 6 30-3S60 1 69 15s-8 20 5 29 20 18 7 30-22-2-27 12-18 21-31 9 5-22-8-29S-2 63 8 50 2 32 13 21Z',
   'M50 5l9 25 24-12-12 25 24 8-25 8 12 24-24-12-9 25-8-26-25 12 13-24-25-9 25-8-12-25 24 13Z',
 ];
-const pathogenPairCount = 3;
-const vectorPathogenSources = Array.from(
-  { length: pathogenPairCount },
-  (_, index) => `/assets/pathogen-scan-pairs/${index + 1}.svg`,
+const pathogenPairIds = [1, 2, 3, 4, 5, 6, 10];
+const vectorPathogenSources = pathogenPairIds.map(
+  pairId => `/assets/pathogen-scan-pairs/${pairId}.svg`,
 );
 
 function createPathogens() {
-  const positions = isVideoStoryboard
+  const positions = isFeedbackStoryboard
+    ? [[12,19,78],[30,34,60],[77,22,52],[86,57,92],[61,16,40],[20,68,47],[71,66,72],[44,22,38],[51,54,84],[7,43,42],[37,14,34],[93,31,46]].map(([x, y, size]) => [x, y, size * 1.2 * (size === 34 ? 1.5 : 1)])
+    : isVideoStoryboard
     ? [[12,19,78],[30,34,60],[77,22,52],[86,57,92],[61,16,40],[20,68,47],[71,66,72],[44,22,38],[51,54,84]]
     : [[15,23,58],[32,36,82],[76,27,52],[85,58,90],[62,18,36],[22,67,44],[70,66,64],[45,25,30]];
   const drifts = [[24,-31,8],[-19,-38,-6],[17,-27,5],[-23,-35,-8],[13,-24,7],[25,-32,-5],[-17,-29,6],[20,-36,-7],[-12,-26,4]];
   positions.forEach(([x,y,size], index) => {
     const [driftX, driftY] = drifts[index % drifts.length];
+    const glowRgb = index % 2 === 0 ? '157,255,0' : '89,194,255';
     const button = document.createElement('button');
     let hoverLockTimer = null;
     button.className = 'pathogen';
     button.type = 'button';
-    if (isVideoStoryboard) button.dataset.scanPair = String(index % pathogenPairCount + 1);
+    if (isVideoStoryboard) button.dataset.scanPair = String(pathogenPairIds[index % pathogenPairIds.length]);
     button.setAttribute('aria-label', `Isolate airborne particle ${index + 1}`);
     button.style.cssText = isVideoStoryboard
-      ? `left:${x}%;top:${y}%;--size:${size}px;--speed:${7.8 + (index % 4) * 1.05}s;--delay:${-index * 1.13}s;--start-x:${(-driftX * .35).toFixed(1)}px;--start-y:${(-driftY * .25).toFixed(1)}px;--mid-x:${(driftX * .2).toFixed(1)}px;--mid-y:${(driftY * .35).toFixed(1)}px;--end-x:${driftX}px;--end-y:${driftY}px`
+      ? `left:${x}%;top:${y}%;--size:${size}px;--glow-rgb:${glowRgb};--speed:${7.8 + (index % 4) * 1.05}s;--delay:${-index * 1.13}s;--start-x:${(-driftX * .35).toFixed(1)}px;--start-y:${(-driftY * .25).toFixed(1)}px;--mid-x:${(driftX * .2).toFixed(1)}px;--mid-y:${(driftY * .35).toFixed(1)}px;--end-x:${driftX}px;--end-y:${driftY}px`
       : `left:${x}%;top:${y}%;--size:${size}px;--speed:${5 + index%4}s;--delay:${-index * .7}s`;
     button.innerHTML = isVideoStoryboard
       ? `<img src="${vectorPathogenSources[index % vectorPathogenSources.length]}" alt="" />`
@@ -133,11 +149,20 @@ function createPathogens() {
       if (frame !== 4) return;
       button.classList.add('is-selected');
       if (!isVideoStoryboard) return;
+      if (isFeedbackStoryboard) {
+        stage.classList.add('is-threat-focus');
+        stage.classList.remove('is-threat-focus-locked');
+        const source = button.querySelector('img')?.src;
+        if (focusThreatImage && source) {
+          focusThreatImage.style.setProperty('--focus-threat-image', `url("${source}")`);
+        }
+      }
       button.classList.add('is-threat-locking');
       clearTimeout(hoverLockTimer);
       hoverLockTimer = window.setTimeout(() => {
         if (frame !== 4 || !button.matches(':hover')) return;
         button.classList.add('is-threat-locked');
+        if (isFeedbackStoryboard) stage.classList.add('is-threat-focus-locked');
         lockPathogen(button);
       }, 2000);
     });
@@ -146,6 +171,7 @@ function createPathogens() {
       clearTimeout(hoverLockTimer);
       hoverLockTimer = null;
       button.classList.remove('is-selected', 'is-threat-locking', 'is-threat-locked');
+      if (isFeedbackStoryboard) stage.classList.remove('is-threat-focus', 'is-threat-focus-locked');
     });
     button.addEventListener('click', () => {
       if (isVideoStoryboard ? frame !== 4 : frame < 4 || frame > 5) return;
@@ -179,9 +205,15 @@ function lockPathogen(button) {
   const pairA = document.querySelector('[data-pair-slot="a"]');
   const pairB = document.querySelector('[data-pair-slot="b"]');
   const realisticSource = `/assets/pathogen-scan-pairs/${scanPair}.png`;
-  if (pairA) pairA.src = image.src;
+  if (pairA) {
+    if (isFeedbackStoryboard) {
+      pairA.style.setProperty('--pair-realistic-image', `url("${realisticSource}")`);
+    } else {
+      pairA.src = image.src;
+    }
+  }
   const specimen = document.querySelector('.pair-scan-specimen');
-  if (pairA && specimen) {
+  if (pairA && specimen && !isFeedbackStoryboard) {
     const specimenBounds = specimen.getBoundingClientRect();
     const targetSize = Math.min(specimenBounds.width, specimenBounds.height);
     const deltaX = bounds.left + bounds.width * .5 - (specimenBounds.left + specimenBounds.width * .5);
@@ -209,14 +241,18 @@ function buildTimeline() {
     button.role = 'tab';
     button.textContent = String(index + 1).padStart(2, '0');
     button.title = item.title;
-    button.addEventListener('click', () => { pause(); setFrame(index + 1); });
+    button.addEventListener('click', () => {
+      pause();
+      remainingDelay = null;
+      setFrame(index + 1);
+    });
     timeline.appendChild(button);
   });
 }
 
 function setFrame(next) {
   const nextFrame = Math.max(1, Math.min(frames.length, next));
-  if (isVideoStoryboard && nextFrame === 6 && frame === 5) {
+  if (isVideoStoryboard && nextFrame === frames.length && frame === frames.length - 1) {
     stage.dispatchEvent(new CustomEvent('storyboard:prepare-final'));
   }
   if (isVideoStoryboard && nextFrame === 5 && frame !== 5) {
@@ -230,6 +266,7 @@ function setFrame(next) {
   }
   frame = nextFrame;
   stage.dataset.frame = frame;
+  if (isFeedbackStoryboard && frame !== 4) stage.classList.remove('is-threat-focus', 'is-threat-focus-locked');
   if (frame === 1) {
     if (playing) heroMeshCut.play();
     else heroMeshCut.showIdle();
@@ -275,7 +312,20 @@ function animateMatch() {
   requestAnimationFrame(tick);
 }
 
-function scheduleNext(delay = frames[frame - 1].duration) {
+function getFrameDuration(frameNumber = frame) {
+  if (!isFeedbackStoryboard) return frames[frameNumber - 1].duration;
+  if (frameNumber === 2) {
+    const speed = Math.max(.4, Number(document.querySelector('#depthScanSpeed')?.value || 1));
+    return 2600 / speed + 600;
+  }
+  if (frameNumber === 5) {
+    const speed = Math.max(.25, Number(document.querySelector('#pairScanSpeed')?.value || 1.25));
+    return Math.max(3000, 3750 / speed);
+  }
+  return frames[frameNumber - 1].duration;
+}
+
+function scheduleNext(delay = getFrameDuration()) {
   clearTimeout(playTimer);
   if (!playing || frame === 1) return;
   remainingDelay = delay;
@@ -296,7 +346,7 @@ function resume() {
   playing = true;
   stage.classList.remove('is-paused');
   if (frame <= 2) heroMeshCut.resume();
-  if (frame !== 1) scheduleNext(remainingDelay ?? frames[frame - 1].duration);
+  if (frame !== 1) scheduleNext(remainingDelay ?? getFrameDuration());
   updatePlayButton();
 }
 function pause() {
