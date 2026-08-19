@@ -14,7 +14,7 @@
         <canvas id="sceneCanvas" aria-hidden="true"></canvas>
         <img class="airport-scan-base" src="/assets/hero-home-pilgrim.png" alt="" aria-hidden="true" />
         <video id="videoPeopleSource" class="video-people-source" muted loop playsinline preload="auto" aria-label="Moving people video with a zoom and fade entrance">
-          <source src="/assets/hero-storyboard-07-2-people.mp4" type="video/mp4" />
+          <source src="/assets/hero-storyboard-07-3-people.mp4" type="video/mp4" />
         </video>
         <canvas id="heroMeshCanvas" class="hero-mesh-canvas" aria-label="Argus ordered point-cloud scan"></canvas>
         <div class="scanlines" aria-hidden="true"></div>
@@ -28,7 +28,7 @@
 
         <div class="sequence-status" data-frame="1" aria-live="polite">
           <div class="sequence-status-bar" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i>
           </div>
           <div class="sequence-status-copy"><i aria-hidden="true"></i><span id="sequenceStatusText">ACTIVATING ARGUS</span></div>
         </div>
@@ -71,8 +71,26 @@
           <div class="figma-hud-status"><i></i><span>SCANNING IN PROGRESS</span></div>
           <img class="figma-hud-caliber" src="/assets/figma/argus-hud/caliber.svg" alt="" />
           <div class="figma-hud-target">
-            <img class="target-frame" src="/assets/figma/argus-hud/target-frame.svg" alt="" />
-            <img class="target-crosshair" src="/assets/figma/argus-hud/crosshair.svg" alt="" />
+            <svg class="target-frame" viewBox="0 0 263 263" fill="none" aria-hidden="true">
+              <g class="target-corner target-corner-tl">
+                <path d="M.5 .5H10.5" /><path d="M.5 .5V10.5" />
+              </g>
+              <g class="target-corner target-corner-tr">
+                <path d="M262.5 .5H252.5" /><path d="M262.5 .5V10.5" />
+              </g>
+              <g class="target-corner target-corner-br">
+                <path d="M262.5 262.5H252.5" /><path d="M262.5 262.5V252.5" />
+              </g>
+              <g class="target-corner target-corner-bl">
+                <path d="M.5 262.5H10.5" /><path d="M.5 262.5V252.5" />
+              </g>
+            </svg>
+            <svg class="target-crosshair" viewBox="0 0 23 23" fill="none" aria-hidden="true">
+              <path d="M11.5 11.5V0" />
+              <path d="M11.5 11.5V23" />
+              <path d="M11.5 11.5H0" />
+              <path d="M11.5 11.5H23" />
+            </svg>
           </div>
 
           <div class="figma-hud-data detection">
@@ -112,17 +130,20 @@
           <div class="pair-scan-line" aria-hidden="true"></div>
 
           <div class="pair-scan-library" aria-hidden="true">
-            <img data-pair="1" src="/assets/pathogen-scan-pairs/1.png" alt="" />
-            <img data-pair="2" src="/assets/pathogen-scan-pairs/2.png" alt="" />
-            <img data-pair="3" src="/assets/pathogen-scan-pairs/3.png" alt="" />
-            <img data-pair="4" src="/assets/pathogen-scan-pairs/4.png" alt="" />
-            <img data-pair="5" src="/assets/pathogen-scan-pairs/5.png" alt="" />
-            <img data-pair="6" src="/assets/pathogen-scan-pairs/6.png" alt="" />
-            <img data-pair="10" src="/assets/pathogen-scan-pairs/10.png" alt="" />
-          </div>
-          <div class="pair-match-window" aria-hidden="true">
-            <span class="pair-match-window-head"></span>
-            <span class="pair-match-window-foot"></span>
+            <span class="pair-library-item" data-pair="1"><img src="/assets/pathogen-scan-pairs/1.png" alt="" /></span>
+            <span class="pair-library-item is-decoy"><img src="/assets/pathogen-database-decoys/01.png" alt="" /></span>
+            <span class="pair-library-item" data-pair="2"><img src="/assets/pathogen-scan-pairs/2.png" alt="" /></span>
+            <span class="pair-library-item is-decoy"><img src="/assets/pathogen-database-decoys/02.png" alt="" /></span>
+            <span class="pair-library-item" data-pair="3"><img src="/assets/pathogen-scan-pairs/3.png" alt="" /></span>
+            <span class="pair-library-item is-decoy"><img src="/assets/pathogen-database-decoys/03.png" alt="" /></span>
+            <span class="pair-library-item" data-pair="4"><img src="/assets/pathogen-scan-pairs/4.png" alt="" /></span>
+            <span class="pair-library-item is-decoy"><img src="/assets/pathogen-database-decoys/04.png" alt="" /></span>
+            <span class="pair-library-item" data-pair="5"><img src="/assets/pathogen-scan-pairs/5.png" alt="" /></span>
+            <span class="pair-library-item is-decoy"><img src="/assets/pathogen-database-decoys/05.png" alt="" /></span>
+            <span class="pair-library-item" data-pair="6"><img src="/assets/pathogen-scan-pairs/6.png" alt="" /></span>
+            <span class="pair-library-item is-decoy"><img src="/assets/pathogen-database-decoys/06.png" alt="" /></span>
+            <span class="pair-library-item" data-pair="10"><img src="/assets/pathogen-scan-pairs/10.png" alt="" /></span>
+            <span class="pair-library-item is-decoy"><img src="/assets/pathogen-database-decoys/07.png" alt="" /></span>
           </div>
         </div>
 
@@ -170,7 +191,7 @@
         <button class="play-button" id="playButton" type="button" aria-label="Play sequence"><span>▶</span></button>
         <div class="timeline" id="timeline" role="tablist" aria-label="Sequence frames"></div>
         <div class="control-meta">
-          <div class="frame-index"><span id="frameNumber">01</span> / 07</div>
+          <div class="frame-index"><span id="frameNumber">01</span> / 06</div>
           <button class="stage-next" id="stageNext" type="button" aria-label="Next frame">NEXT <span>→</span></button>
         </div>
       </nav>

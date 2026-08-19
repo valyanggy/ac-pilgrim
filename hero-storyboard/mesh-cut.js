@@ -469,7 +469,7 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
         uniforms.uSlice.value = THREE.MathUtils.lerp(1.8, -1.95, sharedScan);
         uniforms.uOpacity.value = modelFade;
         if (isFeedbackStoryboard) {
-          depthHandoffProgress = smoothRange(master, .4, 1) * .6;
+          depthHandoffProgress = THREE.MathUtils.clamp(master - .4, 0, .6);
           applyDepthTravel(depthHandoffProgress, true, null, depthHandoffProgress);
         } else {
           depthUniforms.uOpacity.value = 0;

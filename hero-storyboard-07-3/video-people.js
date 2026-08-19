@@ -11,10 +11,9 @@ const pairScanSpecimen = document.querySelector('.pair-scan-specimen');
 const pairScanGuiToggle = document.querySelector('#pairScanGuiToggle');
 const pairScanSpeedInput = document.querySelector('#pairScanSpeed');
 const pairScanLine = document.querySelector('.pair-scan-line');
-const pairScanLibrary = document.querySelector('.pair-scan-library');
+const pairLibraryItems = [...document.querySelectorAll('.pair-library-item')];
 const pairLibraryImages = [...document.querySelectorAll('.pair-scan-library img')];
 const pairInspectionMeta = [...document.querySelectorAll('.pair-inspection-meta')];
-const pairMatchWindow = document.querySelector('.pair-match-window');
 const finalFrameVideo = document.querySelector('#finalFrameVideo');
 const finalFramePair = document.querySelector('#finalFramePair');
 const sequenceStatus = document.querySelector('.sequence-status');
@@ -171,6 +170,25 @@ function smoothstep(value) {
   return clamped * clamped * (3 - 2 * clamped);
 }
 
+function scanEase(value) {
+  const x = Math.max(0, Math.min(1, value));
+  const sample = (a, b, t) => {
+    const c = 3 * a;
+    const d = 3 * (b - a) - c;
+    const e = 1 - c - d;
+    return ((e * t + d) * t + c) * t;
+  };
+  let low = 0;
+  let high = 1;
+  let t = x;
+  for (let iteration = 0; iteration < 14; iteration += 1) {
+    t = (low + high) * .5;
+    if (sample(.85, .15, t) < x) low = t;
+    else high = t;
+  }
+  return sample(0, 1, t);
+}
+
 let wasVisible = false;
 let animationFrame = 0;
 let povTargetX = 0;
@@ -185,7 +203,6 @@ let sequenceStatusTarget = 'ACTIVATING ARGUS';
 let frameStartedAt = performance.now();
 const sequenceStatusMessages = [
   'ACTIVATING ARGUS',
-  'ACTIVATING ARGUS',
   'DETECTION IN PROGRESS',
   'DETECTION IN PROGRESS',
   'CHARACTERIZATION IN PROGRESS',
@@ -194,51 +211,57 @@ const sequenceStatusMessages = [
 ];
 
 const shuffleGlyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-let pairMatchPath = [];
+let pairProbeItems = [];
+let pairMatchItem = null;
+const pairProbeCount = 7;
+const pairProbeBaseDelay = 1700;
+const pairProbeStaggerRange = 900;
+const pairProbeDuration = 1100;
+let pairMatchAt = 1100;
+const pairMatchRevealDuration = 1100;
 
 function preparePairMatchPath() {
   const selectedPair = Number(stage.dataset.selectedPair || 1);
-  const matchingIndexes = pairLibraryImages
-    .map((image, index) => Number(image.dataset.pair) === selectedPair ? index : -1)
-    .filter(index => index >= 0);
-  const targetIndex = matchingIndexes.at(-1) ?? pairLibraryImages.length - 1;
-  const decoys = pairLibraryImages
-    .map((image, index) => ({ index, pair: Number(image.dataset.pair) }))
-    .filter(item => item.index !== targetIndex && item.pair !== selectedPair);
-  for (let index = decoys.length - 1; index > 0; index -= 1) {
+  pairMatchItem = pairLibraryItems.find(item => Number(item.dataset.pair) === selectedPair)
+    || pairLibraryItems.find(item => item.dataset.pair);
+  const falseItems = pairLibraryItems.filter(item => item !== pairMatchItem);
+  for (let index = falseItems.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1));
-    [decoys[index], decoys[swapIndex]] = [decoys[swapIndex], decoys[index]];
+    [falseItems[index], falseItems[swapIndex]] = [falseItems[swapIndex], falseItems[index]];
   }
-  pairMatchPath = [...decoys.slice(0, 2).map(item => item.index), targetIndex];
+  pairProbeItems = falseItems.slice(0, pairProbeCount);
+  pairLibraryItems.forEach(item => {
+    item.classList.remove('is-probing', 'is-match-pending', 'is-match');
+    item.style.removeProperty('--probe-delay');
+    item.style.removeProperty('--match-delay');
+  });
+  void stage.offsetWidth;
+  pairProbeItems.forEach((item, index) => {
+    const evenOffset = pairProbeItems.length > 1
+      ? index / (pairProbeItems.length - 1) * pairProbeStaggerRange
+      : 0;
+    const jitter = (Math.random() - .5) * 90;
+    const stagger = Math.max(0, Math.min(pairProbeStaggerRange, evenOffset + jitter));
+    const delay = pairProbeBaseDelay + Math.round(stagger);
+    item.style.setProperty('--probe-delay', `${delay}ms`);
+    item.classList.add('is-probing');
+  });
+  // The correct cell is the final blue probe; that same window then resolves to red.
+  pairMatchAt = pairProbeBaseDelay + pairProbeStaggerRange + 100;
+  if (pairMatchItem) {
+    pairMatchItem.style.setProperty('--match-delay', `${pairMatchAt}ms`);
+    pairMatchItem.classList.add('is-match-pending');
+  }
 }
 
-function updatePairInspection(elapsed, complete = false, matchDuration = 3000) {
-  if (!pairMatchPath.length) preparePairMatchPath();
-  const selectedIndex = pairMatchPath.at(-1) ?? pairLibraryImages.length - 1;
-  const hopDuration = matchDuration / Math.max(1, pairMatchPath.length - 1);
-  const totalDuration = matchDuration;
-  const safeElapsed = Math.max(0, elapsed);
-  const pathPosition = complete ? pairMatchPath.length - 1 : Math.min(pairMatchPath.length - 1, safeElapsed / hopDuration);
-  const pathStart = Math.min(pairMatchPath.length - 1, Math.floor(pathPosition));
-  const pathEnd = Math.min(pairMatchPath.length - 1, pathStart + 1);
-  const hopProgress = smoothstep(pathPosition - pathStart);
-  const startBounds = pairLibraryImages[pairMatchPath[pathStart]]?.getBoundingClientRect();
-  const endBounds = pairLibraryImages[pairMatchPath[pathEnd]]?.getBoundingClientRect();
-  const libraryBounds = pairScanLibrary?.getBoundingClientRect();
-  const stageBounds = stage.getBoundingClientRect();
-  const matched = complete || safeElapsed >= totalDuration;
-  if (pairMatchWindow && startBounds && endBounds && libraryBounds) {
-    const startCenter = startBounds.top + startBounds.height * .5;
-    const endCenter = endBounds.top + endBounds.height * .5;
-    const windowSize = Math.max(48, libraryBounds.width - 14);
-    const top = startCenter + (endCenter - startCenter) * hopProgress - windowSize * .5 - stageBounds.top;
-    pairMatchWindow.style.left = `${(libraryBounds.left + (libraryBounds.width - windowSize) * .5 - stageBounds.left).toFixed(2)}px`;
-    pairMatchWindow.style.top = `${top.toFixed(2)}px`;
-    pairMatchWindow.style.width = `${windowSize.toFixed(2)}px`;
-    pairMatchWindow.style.height = `${windowSize.toFixed(2)}px`;
-    pairMatchWindow.classList.toggle('is-matched', matched);
+function updatePairInspection(elapsed, complete = false) {
+  if (!pairProbeItems.length || !pairMatchItem) preparePairMatchPath();
+  const matched = complete || elapsed >= pairMatchAt + pairMatchRevealDuration;
+  if (matched && pairMatchItem) {
+    pairMatchItem.classList.remove('is-match-pending');
+    pairMatchItem.classList.add('is-match');
   }
-  pairLibraryImages.forEach((image, index) => image.classList.toggle('active', index === selectedIndex && matched));
+  pairLibraryImages.forEach(image => image.classList.toggle('active', matched && image.parentElement === pairMatchItem));
   pairInspectionMeta.forEach((element, index) => {
     const text = (element.dataset.typewriter || '').replace(/\\n/g, '\n');
     const count = complete ? text.length : Math.max(0, Math.min(text.length, Math.floor((elapsed - index * 130) * .035)));
@@ -309,27 +332,36 @@ function render() {
   animationFrame = requestAnimationFrame(render);
   const now = performance.now();
   const frame = Number(stage.dataset.frame || 1);
-  const characterizationFrame = frame === 5;
-  const characterizedFrame = frame === 6 || frame === 7;
+  const characterizationFrame = frame === 4;
+  const characterizedFrame = frame === 5 || frame === 6;
   const pairFrame = characterizationFrame || characterizedFrame;
-  // Frame 07 is the exact completed frame 06 composition with only the headline
+  // Frame 06 is the exact completed frame 05 composition with only the headline
   // added, so leave the last dither render frozen instead of continuing its noise.
-  pathogenGlyphDither.setActive(pairFrame && frame !== 7);
+  pathogenGlyphDither.setActive(pairFrame && frame !== 6);
   if (frame !== previousFrame) {
     frameStartedAt = now;
-    if (frame === 4) {
+    if (frame === 1) video.currentTime = 0;
+    if (frame === 2) {
+      document.querySelectorAll('.pathogen').forEach(el => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+    }
+    if (frame === 3) {
       hudTypewriterEntries.forEach(([element]) => { element.textContent = '' });
       hudTypeStartedAt = now;
       resetDetectionLog(now + 500);
     }
-    if (frame === 5) {
-      pairMatchPath = [];
+    if (frame === 4) {
+      pairProbeItems = [];
+      pairMatchItem = null;
       preparePairMatchPath();
     }
     const nextSequenceStatusTarget = sequenceStatusMessages[frame - 1] || sequenceStatusMessages.at(-1);
     const sequenceStatusChanged = nextSequenceStatusTarget !== sequenceStatusTarget;
     sequenceStatusTarget = nextSequenceStatusTarget;
-    if (frame === 7) {
+    if (frame === 6) {
       sequenceStatusText.textContent = sequenceStatusTarget;
       sequenceScrambleStartedAt = -1;
     } else if (sequenceStatusChanged) {
@@ -341,9 +373,9 @@ function render() {
   if (sequenceStatus) sequenceStatus.dataset.frame = String(frame);
   updateSequenceScramble(now);
   updateHudTypewriter(now);
-  if (frame === 4) renderDetectionLog(now);
-  const visible = frame >= 1 && frame <= 7;
-  const povActive = frame === 4 || characterizationFrame;
+  if (frame === 3) renderDetectionLog(now);
+  const visible = frame >= 1 && frame <= 6;
+  const povActive = frame === 3 || characterizationFrame;
   const rawProgress = frame <= 2 ? Number(travelInput.value) : visible ? 1 : 0;
   const progress = smoothstep(rawProgress);
   const frameElapsed = now - frameStartedAt;
@@ -354,13 +386,19 @@ function render() {
   const frame5OverlayOpacity = characterizationFrame ? 1 - smoothstep(frameElapsed / 720) : characterizedFrame ? 0 : 1;
   const frame5BackdropProgress = characterizationFrame ? smoothstep((frameElapsed - 900) / 600) : characterizedFrame ? 1 : 0;
   const backgroundFade = pairFrame ? 1 - frame5BackdropProgress * .26 : 1;
+  const pairSceneDim = characterizationFrame
+    ? .52 - smoothstep(frameElapsed / 800) * .36
+    : characterizedFrame ? .16 : 0;
   const pairContentProgress = characterizationFrame ? smoothstep(frameElapsed / 850) : characterizedFrame ? 1 : 0;
   const scanElapsed = frameElapsed;
-  const pairScanSpeed = Math.max(.25, Number(pairScanSpeedInput?.value || 1.25));
-  const pairScanDuration = 3750 / pairScanSpeed;
+  const pairScanDelay = 1500;
+  const pairScanDuration = 2200;
+  const pairScanRawProgress = characterizedFrame
+    ? 1
+    : scanElapsed <= pairScanDelay ? 0 : Math.min(1, (scanElapsed - pairScanDelay) / pairScanDuration);
   const pairScanProgress = characterizedFrame
     ? 1
-    : scanElapsed <= 0 ? 0 : Math.min(1, scanElapsed / pairScanDuration);
+    : scanEase(pairScanRawProgress);
 
   if (!povActive) {
     povTargetX = 0;
@@ -383,7 +421,7 @@ function render() {
   stage.style.setProperty('--frame5-scene-blur', `${(sceneBlurProgress * 15).toFixed(2)}px`);
   stage.style.setProperty('--frame5-background-scale', (1.06 + lockProgress * .12).toFixed(4));
   stage.style.setProperty('--pair-backdrop-opacity', (pairContentProgress * .9).toFixed(4));
-  stage.style.setProperty('--pair-scene-dim', (frame5BackdropProgress * .16).toFixed(4));
+  stage.style.setProperty('--pair-scene-dim', pairSceneDim.toFixed(4));
   stage.style.setProperty('--pair-content-opacity', pairContentProgress.toFixed(4));
   stage.style.setProperty('--pair-specimen-scale', (.88 + pairContentProgress * .12).toFixed(4));
   stage.style.setProperty('--pair-progress', `${(pairScanProgress * 100).toFixed(2)}%`);
@@ -396,16 +434,20 @@ function render() {
     const scanPercent = pairScanProgress * 100;
     pairScanImageA.style.clipPath = `inset(${scanPercent.toFixed(3)}% 0 0 0)`;
     pairScanImageB.style.clipPath = `inset(0 0 ${(100 - scanPercent).toFixed(3)}% 0)`;
-    pairScanLine.style.top = `${(20.111 + pairScanProgress * 59.334).toFixed(3)}%`;
-    updatePairInspection(frameElapsed, characterizedFrame, 3000);
-    if (frame === 6) updatePairMetadataScramble(frameElapsed);
+    const scanTravel = pairScanSpecimen.clientHeight * pairScanProgress;
+    pairScanLine.style.transform = `translate3d(0, ${scanTravel.toFixed(2)}px, 0)`;
+    updatePairInspection(frameElapsed, characterizedFrame);
+    if (frame === 5) updatePairMetadataScramble(frameElapsed);
   }
 
   video.style.opacity = visible ? String(progress * backgroundFade) : '0';
   video.style.filter = pairFrame
     ? `blur(${(sceneBlurProgress * 15).toFixed(2)}px) brightness(${(1 - sceneBlurProgress * .42).toFixed(3)})`
     : 'blur(0px) brightness(1)';
-  const videoScale = 1 + progress * .16 + (pairFrame ? lockProgress * .06 : 0);
+  // Fade and camera push share one continuous 01→02 progress value, so the
+  // crowd starts moving the instant it becomes visible and never restarts.
+  const entranceZoom = frame <= 2 ? progress : 1;
+  const videoScale = 1 + entranceZoom * .16 + (pairFrame ? lockProgress * .06 : 0);
   const lockX = Number.parseFloat(stage.style.getPropertyValue('--lock-x')) || 50;
   const lockY = Number.parseFloat(stage.style.getPropertyValue('--lock-y')) || 50;
   const desiredCenterX = (50 - lockX) / 100 * stage.clientWidth * videoScale;
@@ -423,7 +465,11 @@ function render() {
   video.style.transformOrigin = '50% 50%';
   video.style.transform = `translate3d(${cameraX.toFixed(2)}px, ${cameraY.toFixed(2)}px, 0) perspective(1200px) rotateY(${(povX * .9).toFixed(3)}deg) rotateX(${(-povY * .55).toFixed(3)}deg) scale(${videoScale.toFixed(4)})`;
 
-  const shouldPlayVideo = frame >= 2 && (frame <= 4 || (characterizationFrame && frameElapsed < 1200));
+  // Play as soon as travel starts revealing the plate (during 01 scan handoff),
+  // so 02 lands on live motion instead of a still that then starts.
+  const shouldPlayVideo = (frame === 1 && progress > .02)
+    || (frame >= 2 && frame <= 3)
+    || (characterizationFrame && frameElapsed < 1200);
   if (shouldPlayVideo && video.paused) video.play().catch(() => {});
   if (!shouldPlayVideo && !video.paused) video.pause();
   wasVisible = visible;

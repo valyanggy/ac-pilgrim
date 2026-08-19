@@ -32,11 +32,11 @@ const originalFrames = [
 const frames = isFeedbackStoryboard
   ? [
       originalFrames[0],
-      originalFrames[1],
-      { ...originalFrames[2], duration: 600 },
-      originalFrames[3],
-      { title: 'PAIR SCAN', state: 'CHARACTERIZATION IN PROGRESS', duration: 3000 },
-      { title: 'CHARACTERIZED', state: 'PATHOGEN CHARACTERIZED', duration: 950 },
+      // 02 merges former optical field + airborne signals: video emerges with pathogens.
+      { ...originalFrames[1], state: 'PARTICLE LAYER / VISIBLE', duration: 3800 },
+      { ...originalFrames[3], duration: 3500 },
+      { title: 'PAIR SCAN', state: 'CHARACTERIZATION IN PROGRESS', duration: 5300 },
+      { title: 'CHARACTERIZED', state: 'PATHOGEN CHARACTERIZED', duration: 1750 },
       { title: 'RESOLVE', state: 'PATHOGEN CHARACTERIZED', duration: 5000 },
     ]
   : isVideoStoryboard
@@ -50,14 +50,22 @@ const frames = isFeedbackStoryboard
     ]
   : originalFrames;
 
+// Feedback 07-3 drops the old standalone airborne beat, so later beats shift down one.
+const acquisitionFrame = isFeedbackStoryboard ? 3 : 4;
+const pairScanFrame = isFeedbackStoryboard ? 4 : 5;
+
 let frame = 1;
 let playing = false;
 let hasStarted = false;
 let playTimer;
 let playDeadline = 0;
 let remainingDelay = null;
+let autoFocusTimer = null;
 let raf;
 let startTime = performance.now();
+const hudInitiationDuration = 2000;
+// Autoplay always resolves pair-scan to centered pair 1; manual click can pick another.
+let preferPrimaryOnPairScan = true;
 
 const heroMeshCut = initHeroMeshCut({
   canvas: document.querySelector('#heroMeshCanvas'),
@@ -124,29 +132,93 @@ const vectorPathogenSources = pathogenPairIds.map(
 );
 
 function createPathogens() {
-  const positions = isFeedbackStoryboard
-    ? [[12,19,78],[30,34,60],[77,22,52],[86,57,92],[61,16,40],[20,68,47],[71,66,72],[44,22,38],[51,54,84],[7,43,42],[37,14,34],[93,31,46]].map(([x, y, size]) => [x, y, size * 1.2 * (size === 34 ? 1.5 : 1)])
-    : isVideoStoryboard
-    ? [[12,19,78],[30,34,60],[77,22,52],[86,57,92],[61,16,40],[20,68,47],[71,66,72],[44,22,38],[51,54,84]]
-    : [[15,23,58],[32,36,82],[76,27,52],[85,58,90],[62,18,36],[22,67,44],[70,66,64],[45,25,30]];
+  // Keep other fireflies outside a ~100px pocket around the centered pair 1.
+  const feedbackOrbit = [
+    [-282, -54, 34],
+    [-176, 108, 42],
+    [-108, 72, 30],
+    [48, 116, 38],
+    [156, 152, 32],
+    [312, 81, 44],
+    [218, -126, 36],
+    [82, -98, 30],
+    [-20, -154, 40],
+    [-146, -166, 28],
+    [244, -28, 34],
+    [-224, 58, 38],
+  ];
+  const feedbackAtmosphere = [
+    [7, 12, 70],
+    [20, 78, 58],
+    [90, 10, 64],
+    [94, 46, 80],
+    [80, 86, 56],
+    [5, 58, 48],
+    [31, 91, 62],
+    [96, 74, 50],
+    [73, 25, 44],
+    [3, 34, 42],
+    [74, 6, 52],
+  ];
   const drifts = [[24,-31,8],[-19,-38,-6],[17,-27,5],[-23,-35,-8],[13,-24,7],[25,-32,-5],[-17,-29,6],[20,-36,-7],[-12,-26,4]];
-  positions.forEach(([x,y,size], index) => {
-    const [driftX, driftY] = drifts[index % drifts.length];
+  const atmospherePairIds = pathogenPairIds.filter(id => id !== 1);
+  const visibleOrbit = feedbackOrbit.filter((_, index) => [0, 2, 3, 5, 7].includes(index));
+  const visibleAtmosphere = feedbackAtmosphere.slice(0, 6);
+  const entries = isFeedbackStoryboard
+    ? [
+        { kind: 'primary', x: 50, y: 45, size: 84 },
+        ...visibleOrbit.map(([orbitX, orbitY, size]) => ({ kind: 'orbit', x: 50, y: 45, size, orbitX, orbitY })),
+        ...visibleAtmosphere.map(([x, y, size]) => ({ kind: 'far', x, y, size })),
+      ]
+    : (isVideoStoryboard
+      ? [[12,19,78],[30,34,60],[77,22,52],[86,57,92],[61,16,40],[20,68,47],[71,66,72],[44,22,38],[51,54,84]]
+      : [[15,23,58],[32,36,82],[76,27,52],[85,58,90],[62,18,36],[22,67,44],[70,66,64],[45,25,30]]
+    ).map(([x, y, size]) => ({ kind: 'far', x, y, size }));
+
+  entries.forEach((entry, index) => {
+    const { kind, x, y, size: sourceSize } = entry;
+    const isPrimary = kind === 'primary';
+    const isOrbit = kind === 'orbit';
+    const size = isFeedbackStoryboard
+      ? isPrimary ? 82 : 60 + ((index * 23) % 47)
+      : sourceSize;
+    const pairId = isPrimary
+      ? 1
+      : isFeedbackStoryboard
+      ? atmospherePairIds[(index - 1) % atmospherePairIds.length]
+      : pathogenPairIds[index % pathogenPairIds.length];
+    const [rawDriftX, rawDriftY] = drifts[index % drifts.length];
+    const driftScale = isPrimary || isOrbit ? 0 : isFeedbackStoryboard ? .35 : 1;
+    const driftX = rawDriftX * driftScale;
+    const driftY = rawDriftY * driftScale;
     const glowRgb = index % 2 === 0 ? '157,255,0' : '89,194,255';
     const button = document.createElement('button');
     let hoverLockTimer = null;
-    button.className = 'pathogen';
+    button.className = isPrimary ? 'pathogen is-primary' : isOrbit ? 'pathogen is-center-orbit' : 'pathogen';
     button.type = 'button';
-    if (isVideoStoryboard) button.dataset.scanPair = String(pathogenPairIds[index % pathogenPairIds.length]);
-    button.setAttribute('aria-label', `Isolate airborne particle ${index + 1}`);
+    if (isVideoStoryboard) button.dataset.scanPair = String(pairId);
+    button.setAttribute('aria-label', isPrimary ? 'Isolate primary airborne particle' : `Isolate airborne particle ${index + 1}`);
+    const responsiveOrbitOffset = (value, axis) => {
+      const magnitude = Math.abs(value);
+      const viewportUnit = axis === 'x' ? 'vw' : 'vh';
+      const viewportValue = magnitude / (axis === 'x' ? 14.4 : 9);
+      const maximum = Math.round(magnitude * 1.6);
+      return value < 0
+        ? `clamp(-${maximum}px,-${viewportValue.toFixed(2)}${viewportUnit},-${magnitude}px)`
+        : `clamp(${magnitude}px,${viewportValue.toFixed(2)}${viewportUnit},${maximum}px)`;
+    };
+    const orbitVars = isOrbit
+      ? `--orbit-x:${responsiveOrbitOffset(entry.orbitX, 'x')};--orbit-y:${responsiveOrbitOffset(entry.orbitY, 'y')};--orbit-size:${size}px;`
+      : '';
+    const feedbackDelay = (1.18 + ((index * 7) % 11) * .035).toFixed(2);
     button.style.cssText = isVideoStoryboard
-      ? `left:${x}%;top:${y}%;--size:${size}px;--glow-rgb:${glowRgb};--speed:${7.8 + (index % 4) * 1.05}s;--delay:${-index * 1.13}s;--start-x:${(-driftX * .35).toFixed(1)}px;--start-y:${(-driftY * .25).toFixed(1)}px;--mid-x:${(driftX * .2).toFixed(1)}px;--mid-y:${(driftY * .35).toFixed(1)}px;--end-x:${driftX}px;--end-y:${driftY}px`
+      ? `left:${x}%;top:${y}%;--size:${size}px;--glow-rgb:${glowRgb};--speed:${isPrimary ? 2.8 : isOrbit ? 3.1 + (index % 5) * .38 : 7.8 + (index % 4) * 1.05}s;--delay:${isFeedbackStoryboard ? feedbackDelay : (-index * 1.13).toFixed(2)}s;--start-x:${(-driftX * .35).toFixed(1)}px;--start-y:${(-driftY * .25).toFixed(1)}px;--mid-x:${(driftX * .2).toFixed(1)}px;--mid-y:${(driftY * .35).toFixed(1)}px;--end-x:${driftX.toFixed(1)}px;--end-y:${driftY.toFixed(1)}px;${orbitVars}`
       : `left:${x}%;top:${y}%;--size:${size}px;--speed:${5 + index%4}s;--delay:${-index * .7}s`;
     button.innerHTML = isVideoStoryboard
-      ? `<img src="${vectorPathogenSources[index % vectorPathogenSources.length]}" alt="" />`
+      ? `<img src="/assets/pathogen-scan-pairs/${pairId}.svg" alt="" />`
       : `<svg viewBox="0 0 100 100"><path d="${pathogenPaths[index % pathogenPaths.length]}" /></svg>`;
     button.addEventListener('mouseenter', () => {
-      if (frame !== 4) return;
+      if (frame !== acquisitionFrame) return;
       button.classList.add('is-selected');
       if (!isVideoStoryboard) return;
       if (isFeedbackStoryboard) {
@@ -160,25 +232,26 @@ function createPathogens() {
       button.classList.add('is-threat-locking');
       clearTimeout(hoverLockTimer);
       hoverLockTimer = window.setTimeout(() => {
-        if (frame !== 4 || !button.matches(':hover')) return;
+        if (frame !== acquisitionFrame || !button.matches(':hover')) return;
         button.classList.add('is-threat-locked');
         if (isFeedbackStoryboard) stage.classList.add('is-threat-focus-locked');
         lockPathogen(button);
       }, 2000);
     });
     button.addEventListener('mouseleave', () => {
-      if (frame !== 4) return;
+      if (frame !== acquisitionFrame) return;
       clearTimeout(hoverLockTimer);
       hoverLockTimer = null;
       button.classList.remove('is-selected', 'is-threat-locking', 'is-threat-locked');
       if (isFeedbackStoryboard) stage.classList.remove('is-threat-focus', 'is-threat-focus-locked');
     });
     button.addEventListener('click', () => {
-      if (isVideoStoryboard ? frame !== 4 : frame < 4 || frame > 5) return;
+      if (isVideoStoryboard ? frame !== acquisitionFrame : frame < 4 || frame > 5) return;
       document.querySelectorAll('.pathogen').forEach(p => p.classList.remove('is-selected'));
       button.classList.add('is-selected');
       if (isVideoStoryboard) lockPathogen(button);
-      setFrame(5);
+      preferPrimaryOnPairScan = false;
+      setFrame(pairScanFrame);
       if (!isVideoStoryboard) window.setTimeout(() => setFrame(6), 850);
     });
     pathogenLayer.appendChild(button);
@@ -189,7 +262,10 @@ function lockPathogen(button) {
   const image = button?.querySelector('img');
   if (!image) return;
   const stageBounds = stage.getBoundingClientRect();
-  const bounds = button.getBoundingClientRect();
+  const lockSource = isFeedbackStoryboard
+    ? document.querySelector('.figma-hud-target') || button
+    : button;
+  const bounds = lockSource.getBoundingClientRect();
   const x = ((bounds.left + bounds.width * .5 - stageBounds.left) / stageBounds.width) * 100;
   const y = ((bounds.top + bounds.height * .5 - stageBounds.top) / stageBounds.height) * 100;
   stage.style.setProperty('--lock-x', `${x.toFixed(3)}%`);
@@ -233,6 +309,29 @@ function lockPathogen(button) {
   }
 }
 
+function focusPrimaryPathogen() {
+  const primary = document.querySelector('.pathogen.is-primary');
+  if (!primary) return;
+  document.querySelectorAll('.pathogen').forEach(pathogen => {
+    pathogen.classList.toggle('is-selected', pathogen === primary);
+    if (pathogen !== primary) pathogen.classList.remove('is-threat-locking', 'is-threat-locked');
+  });
+  primary.classList.add('is-threat-locking');
+  stage.classList.add('is-threat-focus');
+  stage.classList.remove('is-threat-focus-locked');
+  focusThreatImage?.style.setProperty('--focus-threat-image', 'url("/assets/pathogen-scan-pairs/1.svg")');
+  lockPathogen(primary);
+}
+
+function schedulePrimaryAutoFocus(delay = hudInitiationDuration) {
+  clearTimeout(autoFocusTimer);
+  autoFocusTimer = window.setTimeout(() => {
+    autoFocusTimer = null;
+    if (!playing || frame !== acquisitionFrame) return;
+    focusPrimaryPathogen();
+  }, delay);
+}
+
 function buildTimeline() {
   frames.forEach((item, index) => {
     const button = document.createElement('button');
@@ -251,22 +350,25 @@ function buildTimeline() {
 }
 
 function setFrame(next) {
+  clearTimeout(autoFocusTimer);
+  autoFocusTimer = null;
   const nextFrame = Math.max(1, Math.min(frames.length, next));
   if (isVideoStoryboard && nextFrame === frames.length && frame === frames.length - 1) {
     stage.dispatchEvent(new CustomEvent('storyboard:prepare-final'));
   }
-  if (isVideoStoryboard && nextFrame === 5 && frame !== 5) {
+  if (isVideoStoryboard && nextFrame === pairScanFrame && frame !== pairScanFrame) {
     stage.style.setProperty('--frame5-hud-opacity', '1');
     stage.style.setProperty('--pair-content-opacity', '0');
     stage.style.setProperty('--pair-backdrop-opacity', '0');
-    stage.style.setProperty('--pair-scene-dim', '0');
+    stage.style.setProperty('--pair-scene-dim', '.52');
     stage.style.setProperty('--frame5-background-opacity', '1');
     stage.style.setProperty('--frame5-overlay-opacity', '1');
     stage.style.setProperty('--pair-progress', '100%');
   }
   frame = nextFrame;
   stage.dataset.frame = frame;
-  if (isFeedbackStoryboard && frame !== 4) stage.classList.remove('is-threat-focus', 'is-threat-focus-locked');
+  if (isFeedbackStoryboard && frame !== acquisitionFrame) stage.classList.remove('is-threat-focus', 'is-threat-focus-locked');
+  if (isFeedbackStoryboard && frame === acquisitionFrame && playing) schedulePrimaryAutoFocus();
   if (frame === 1) {
     if (playing) heroMeshCut.play();
     else heroMeshCut.showIdle();
@@ -280,10 +382,22 @@ function setFrame(next) {
     button.setAttribute('aria-selected', index + 1 === frame);
   });
   stageNext.innerHTML = frame === frames.length ? 'REPLAY <span>↻</span>' : 'NEXT <span>→</span>';
-  if (frame === 5 && !document.querySelector('.pathogen.is-selected')) {
-    const fallback = document.querySelectorAll('.pathogen')[3];
-    fallback.classList.add('is-selected');
-    if (isVideoStoryboard) lockPathogen(fallback);
+  if (frame === pairScanFrame) {
+    if (isFeedbackStoryboard && preferPrimaryOnPairScan) {
+      const primary = document.querySelector('.pathogen.is-primary');
+      document.querySelectorAll('.pathogen').forEach(p => {
+        p.classList.toggle('is-selected', p === primary);
+        if (p !== primary) p.classList.remove('is-threat-locking', 'is-threat-locked');
+      });
+      if (primary) lockPathogen(primary);
+    } else if (!document.querySelector('.pathogen.is-selected')) {
+      const fallback = document.querySelector('.pathogen.is-primary')
+        || document.querySelector('.pathogen[data-scan-pair="1"]')
+        || document.querySelector('.pathogen');
+      fallback?.classList.add('is-selected');
+      if (isVideoStoryboard && fallback) lockPathogen(fallback);
+    }
+    preferPrimaryOnPairScan = true;
   }
   if (!isVideoStoryboard) {
     if (frame === 6) animateMatch();
@@ -316,11 +430,10 @@ function getFrameDuration(frameNumber = frame) {
   if (!isFeedbackStoryboard) return frames[frameNumber - 1].duration;
   if (frameNumber === 2) {
     const speed = Math.max(.4, Number(document.querySelector('#depthScanSpeed')?.value || 1));
-    return 2600 / speed + 600;
+    return 2600 / speed + 900;
   }
-  if (frameNumber === 5) {
-    const speed = Math.max(.25, Number(document.querySelector('#pairScanSpeed')?.value || 1.25));
-    return Math.max(3000, 3750 / speed);
+  if (frameNumber === pairScanFrame) {
+    return 5300;
   }
   return frames[frameNumber - 1].duration;
 }
@@ -345,6 +458,7 @@ function resume() {
   hasStarted = true;
   playing = true;
   stage.classList.remove('is-paused');
+  if (isFeedbackStoryboard && frame === acquisitionFrame) schedulePrimaryAutoFocus();
   if (frame <= 2) heroMeshCut.resume();
   if (frame !== 1) scheduleNext(remainingDelay ?? getFrameDuration());
   updatePlayButton();
@@ -354,6 +468,8 @@ function pause() {
   playing = false;
   if (playTimer) remainingDelay = Math.max(0, playDeadline - performance.now());
   clearTimeout(playTimer);
+  clearTimeout(autoFocusTimer);
+  autoFocusTimer = null;
   playTimer = null;
   stage.classList.add('is-paused');
   if (frame <= 2) heroMeshCut.pause();
