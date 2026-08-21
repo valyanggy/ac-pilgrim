@@ -16,6 +16,7 @@ const depthGuiToggle = document.querySelector('#depthGuiToggle');
 const focusThreatImage = document.querySelector('#focusThreatImage');
 const isVideoStoryboard = document.querySelector('.video-storyboard') !== null;
 const isFeedbackStoryboard = document.querySelector('.feedback-storyboard') !== null;
+const usesIdleAutoFocus = stage.dataset.idleAutoFocus === 'true';
 
 const originalFrames = [
   { title: 'ARGUS SCAN', state: 'POINT MODEL / ACTIVE', duration: 7000 },
@@ -33,9 +34,9 @@ const frames = isFeedbackStoryboard
   ? [
       originalFrames[0],
       // 02 merges former optical field + airborne signals: video emerges with pathogens.
-      { ...originalFrames[1], state: 'PARTICLE LAYER / VISIBLE', duration: 3800 },
-      { ...originalFrames[3], duration: 3500 },
-      { title: 'PAIR SCAN', state: 'CHARACTERIZATION IN PROGRESS', duration: 5300 },
+      { ...originalFrames[1], state: 'PARTICLE LAYER / VISIBLE', duration: Number(stage.dataset.opticalDuration || 3800) },
+      { ...originalFrames[3], duration: Number(stage.dataset.acquisitionDuration || 3500) },
+      { title: 'PAIR SCAN', state: 'CHARACTERIZATION IN PROGRESS', duration: Number(stage.dataset.pairScanDuration || 5300) },
       { title: 'CHARACTERIZED', state: 'PATHOGEN CHARACTERIZED', duration: 1750 },
       { title: 'RESOLVE', state: 'PATHOGEN CHARACTERIZED', duration: 5000 },
     ]
@@ -61,16 +62,48 @@ let playTimer;
 let playDeadline = 0;
 let remainingDelay = null;
 let autoFocusTimer = null;
+let lastPointerX = Number.NaN;
+let lastPointerY = Number.NaN;
+let lastIntentionalPointerMoveAt = Number.NEGATIVE_INFINITY;
 let raf;
 let startTime = performance.now();
-const hudInitiationDuration = 2000;
+const hudInitiationDuration = Number(stage.dataset.autoFocusDelay || 2000);
 // Autoplay always resolves pair-scan to centered pair 1; manual click can pick another.
 let preferPrimaryOnPairScan = true;
+
+stage.addEventListener('pointermove', event => {
+  const moved = Number.isFinite(lastPointerX)
+    ? Math.hypot(event.clientX - lastPointerX, event.clientY - lastPointerY) > 1
+    : Math.hypot(event.movementX || 0, event.movementY || 0) > 1;
+  if (moved) {
+    lastIntentionalPointerMoveAt = performance.now();
+  }
+  lastPointerX = event.clientX;
+  lastPointerY = event.clientY;
+}, { capture: true, passive: true });
+
+function holdAcquisitionForHover() {
+  if (!usesIdleAutoFocus || !playing || frame !== acquisitionFrame) return;
+  clearTimeout(autoFocusTimer);
+  autoFocusTimer = null;
+  clearTimeout(playTimer);
+  playTimer = null;
+  remainingDelay = null;
+}
+
+function restartAcquisitionIdleWindow() {
+  if (!usesIdleAutoFocus || !playing || frame !== acquisitionFrame) return;
+  schedulePrimaryAutoFocus(hudInitiationDuration);
+  scheduleNext(getFrameDuration(acquisitionFrame));
+}
 
 const heroMeshCut = initHeroMeshCut({
   canvas: document.querySelector('#heroMeshCanvas'),
   onDepthReveal: (value) => {
     stage.style.setProperty('--airport-reveal', value.toFixed(4));
+  },
+  onScanProgress: (value) => {
+    stage.style.setProperty('--mesh-sequence-progress', value.toFixed(4));
   },
   onComplete: () => {
     if (frame === 1 && playing) setFrame(2);
@@ -164,10 +197,14 @@ function createPathogens() {
   const atmospherePairIds = pathogenPairIds.filter(id => id !== 1);
   const visibleOrbit = feedbackOrbit.filter((_, index) => [0, 2, 3, 5, 7].includes(index));
   const visibleAtmosphere = feedbackAtmosphere.slice(0, 6);
+  const innerOrbitScale = Number(stage.dataset.innerOrbitScale || 1);
   const entries = isFeedbackStoryboard
     ? [
         { kind: 'primary', x: 50, y: 45, size: 84 },
-        ...visibleOrbit.map(([orbitX, orbitY, size]) => ({ kind: 'orbit', x: 50, y: 45, size, orbitX, orbitY })),
+        ...visibleOrbit.map(([orbitX, orbitY, size]) => {
+          const scale = Math.hypot(orbitX, orbitY) < 180 ? innerOrbitScale : 1;
+          return { kind: 'orbit', x: 50, y: 45, size, orbitX: orbitX * scale, orbitY: orbitY * scale };
+        }),
         ...visibleAtmosphere.map(([x, y, size]) => ({ kind: 'far', x, y, size })),
       ]
     : (isVideoStoryboard
@@ -217,8 +254,14 @@ function createPathogens() {
     button.innerHTML = isVideoStoryboard
       ? `<img src="/assets/pathogen-scan-pairs/${pairId}.svg" alt="" />`
       : `<svg viewBox="0 0 100 100"><path d="${pathogenPaths[index % pathogenPaths.length]}" /></svg>`;
-    button.addEventListener('mouseenter', () => {
+    const beginPathogenHover = () => {
       if (frame !== acquisitionFrame) return;
+      holdAcquisitionForHover();
+      if (usesIdleAutoFocus) {
+        if (button.classList.contains('is-user-hovering')) return;
+        button.classList.add('is-user-hovering');
+        stage.classList.add('is-scan-cursor-active');
+      }
       button.classList.add('is-selected');
       if (!isVideoStoryboard) return;
       if (isFeedbackStoryboard) {
@@ -237,13 +280,22 @@ function createPathogens() {
         if (isFeedbackStoryboard) stage.classList.add('is-threat-focus-locked');
         lockPathogen(button);
       }, 2000);
+    };
+    button.addEventListener('mouseenter', () => {
+      if (!usesIdleAutoFocus) beginPathogenHover();
+    });
+    button.addEventListener('pointermove', () => {
+      if (usesIdleAutoFocus && performance.now() - lastIntentionalPointerMoveAt < 180) beginPathogenHover();
     });
     button.addEventListener('mouseleave', () => {
       if (frame !== acquisitionFrame) return;
+      if (usesIdleAutoFocus && !button.classList.contains('is-user-hovering')) return;
       clearTimeout(hoverLockTimer);
       hoverLockTimer = null;
-      button.classList.remove('is-selected', 'is-threat-locking', 'is-threat-locked');
+      button.classList.remove('is-selected', 'is-threat-locking', 'is-threat-locked', 'is-user-hovering');
       if (isFeedbackStoryboard) stage.classList.remove('is-threat-focus', 'is-threat-focus-locked');
+      if (usesIdleAutoFocus) stage.classList.remove('is-scan-cursor-active');
+      restartAcquisitionIdleWindow();
     });
     button.addEventListener('click', () => {
       if (isVideoStoryboard ? frame !== acquisitionFrame : frame < 4 || frame > 5) return;
@@ -317,6 +369,7 @@ function focusPrimaryPathogen() {
     if (pathogen !== primary) pathogen.classList.remove('is-threat-locking', 'is-threat-locked');
   });
   primary.classList.add('is-threat-locking');
+  if (usesIdleAutoFocus) stage.classList.remove('is-scan-cursor-active');
   stage.classList.add('is-threat-focus');
   stage.classList.remove('is-threat-focus-locked');
   focusThreatImage?.style.setProperty('--focus-threat-image', 'url("/assets/pathogen-scan-pairs/1.svg")');
@@ -367,7 +420,10 @@ function setFrame(next) {
   }
   frame = nextFrame;
   stage.dataset.frame = frame;
-  if (isFeedbackStoryboard && frame !== acquisitionFrame) stage.classList.remove('is-threat-focus', 'is-threat-focus-locked');
+  if (isFeedbackStoryboard && frame !== acquisitionFrame) {
+    stage.classList.remove('is-threat-focus', 'is-threat-focus-locked', 'is-scan-cursor-active');
+    document.querySelectorAll('.pathogen.is-user-hovering').forEach(pathogen => pathogen.classList.remove('is-user-hovering'));
+  }
   if (isFeedbackStoryboard && frame === acquisitionFrame && playing) schedulePrimaryAutoFocus();
   if (frame === 1) {
     if (playing) heroMeshCut.play();
@@ -433,7 +489,7 @@ function getFrameDuration(frameNumber = frame) {
     return 2600 / speed + 900;
   }
   if (frameNumber === pairScanFrame) {
-    return 5300;
+    return Number(stage.dataset.pairScanDuration || 5300);
   }
   return frames[frameNumber - 1].duration;
 }

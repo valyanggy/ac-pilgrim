@@ -193,7 +193,7 @@ function buildDepthGeometry(image, step = 3) {
   return geometry;
 }
 
-export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal }) {
+export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal, onScanProgress }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
@@ -393,6 +393,7 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
     currentTravel = 0;
     depthHandoffProgress = 0;
     onDepthReveal?.(0);
+    onScanProgress?.(0);
     if (depthCloud) depthCloud.position.z = -depthControls.imageGap;
     onTravel?.(0);
     camera.position.copy(cameraDirection).multiplyScalar(11.7);
@@ -463,6 +464,7 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
       if (elapsed >= 0) {
         const scanDuration = sequenceDuration / Math.max(.4, depthControls.scanSpeed);
         const master = THREE.MathUtils.clamp(elapsed / scanDuration, 0, 1);
+        onScanProgress?.(master);
         const sharedScan = master;
         const modelFade = 1 - smoothRange(master, isFeedbackStoryboard ? .68 : isVideoStoryboard ? .9 : .78, 1);
 
@@ -555,6 +557,7 @@ export function initHeroMeshCut({ canvas, onComplete, onTravel, onDepthReveal })
       uniforms.uOpacity.value = 1;
       depthUniforms.uOpacity.value = 0;
       onDepthReveal?.(0);
+      onScanProgress?.(0);
       currentTravel = 0;
       depthHandoffProgress = 0;
       depthSequenceStart = 0;

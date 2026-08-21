@@ -32,6 +32,7 @@ export default defineConfig({
         heroStoryboard: resolve(import.meta.dirname, 'hero-storyboard/index.html'),
         heroStoryboard072: resolve(import.meta.dirname, 'hero-storyboard-07-2/index.html'),
         heroStoryboard073: resolve(import.meta.dirname, 'hero-storyboard-07-3/index.html'),
+        heroStoryboard074: resolve(import.meta.dirname, 'hero-storyboard-07-4/index.html'),
         renderingStudies: resolve(import.meta.dirname, 'rendering-studies/index.html')
       }
     }
